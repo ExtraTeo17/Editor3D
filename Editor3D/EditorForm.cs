@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Editor3D.Shapes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,8 +16,6 @@ namespace Editor3D
         private const int FRAMES_PER_SECOND = 3;
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
-        private int bitmapWidth;
-        private int bitmapHeight;
         private Bitmap bitmap;
 
         public EditorForm()
@@ -28,9 +27,7 @@ namespace Editor3D
 
         private void PrepareBitmap()
         {
-            bitmapWidth = pictureBox1.Width;
-            bitmapHeight = pictureBox1.Height;
-            bitmap = new Bitmap(bitmapWidth, bitmapHeight);
+            bitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             pictureBox1.Image = bitmap;
         }
 
@@ -45,9 +42,24 @@ namespace Editor3D
 
         private void RenderGraphics(object sender, EventArgs e)
         {
-            for (int i = 0; i < bitmapWidth; ++i)
+            RenderCuboid();
+        }
+
+        private void RenderCuboid()
+        {
+            Cuboid cuboid = new Cuboid(3, 4, 5);
+            cuboid.Render();
+            pictureBox1.Refresh();
+        }
+
+        /**
+         * UNUSED
+         */
+        private void RenderColor(object sender, EventArgs e)
+        {
+            for (int i = 0; i < bitmap.Width; ++i)
             {
-                for (int j = 0; j < bitmapHeight; ++j)
+                for (int j = 0; j < bitmap.Height; ++j)
                 {
                     bitmap.SetPixel(i, j, colors[currentColorIndex]);
                 }
