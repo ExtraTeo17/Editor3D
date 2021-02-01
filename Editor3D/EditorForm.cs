@@ -15,11 +15,23 @@ namespace Editor3D
         private const int FRAMES_PER_SECOND = 3;
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
+        private int bitmapWidth;
+        private int bitmapHeight;
+        private Bitmap bitmap;
 
         public EditorForm()
         {
             InitializeComponent();
+            PrepareBitmap();
             RenderGraphicsPeriodically();
+        }
+
+        private void PrepareBitmap()
+        {
+            bitmapWidth = pictureBox1.Width;
+            bitmapHeight = pictureBox1.Height;
+            bitmap = new Bitmap(bitmapWidth, bitmapHeight);
+            pictureBox1.Image = bitmap;
         }
 
         private void RenderGraphicsPeriodically()
@@ -33,9 +45,6 @@ namespace Editor3D
 
         private void RenderGraphics(object sender, EventArgs e)
         {
-            int bitmapWidth = pictureBox1.Width;
-            int bitmapHeight = pictureBox1.Height;
-            Bitmap bitmap = new Bitmap(bitmapWidth, bitmapHeight);
             for (int i = 0; i < bitmapWidth; ++i)
             {
                 for (int j = 0; j < bitmapHeight; ++j)
@@ -48,7 +57,7 @@ namespace Editor3D
             {
                 currentColorIndex = 0;
             }
-            pictureBox1.Image = bitmap;
+            pictureBox1.Refresh();
         }
     }
 }
