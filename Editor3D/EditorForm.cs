@@ -1,4 +1,5 @@
 ﻿using Editor3D.Shapes;
+using Editor3D.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -47,7 +48,7 @@ namespace Editor3D
 
         private void RenderCuboid()
         {
-            Cuboid cuboid = new Cuboid(3, 4, 5);
+            Cuboid cuboid = new Cuboid(3, 4, 5, new Vector(0, 0, 0, 1));
             cuboid.Render();
             pictureBox1.Refresh();
         }
