@@ -8,5 +8,11 @@ namespace Editor3D.Utilities
     {
         private Vector position;
         private Vector normalVector;
+
+        public Vertex(Vector position, Vector normalVector)
+        {
+            this.position = position;
+            this.normalVector = normalVector;
+        }
     }
 }

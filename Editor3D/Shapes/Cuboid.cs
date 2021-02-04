@@ -8,7 +8,7 @@ namespace Editor3D.Shapes
     class Cuboid
     {
         private double a, b, c;
-        private List<TriangleMesh> meshes;
+        private List<CuboidWall> walls;
 
         public Cuboid(double a, double b, double c, Vector position)
         {
@@ -22,13 +22,15 @@ namespace Editor3D.Shapes
         {
             InitializeWall(position, position.CloneMoved(a, 0, 0),
                 position.CloneMoved(a, 0, c),
-                position.CloneMoved(0, 0, c));
+                position.CloneMoved(0, 0, c),
+                new Vector(0, -1, 0, 0));
+            // TODO: Initialize the rest of the walls
         }
 
-        private void InitializeWall(Vector pos1, Vector pos2, Vector pos3, Vector pos4)
+        private void InitializeWall(Vector pos1, Vector pos2, Vector pos3, Vector pos4, Vector normalVector)
         {
-            TriangleMesh mesh = new TriangleMesh(pos1, pos2, pos3, pos4);
-            meshes.Add(mesh);
+            CuboidWall wall = new CuboidWall(pos1, pos2, pos3, pos4, normalVector);
+            walls.Add(wall);
         }
 
         internal void Render()

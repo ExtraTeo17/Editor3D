@@ -8,7 +8,10 @@ namespace Editor3D.Utilities
 
         public Vector(double x, double y, double z, double w)
         {
-
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.w = w;
         }
 
         internal Vector CloneMoved(double a, double b, double c)
