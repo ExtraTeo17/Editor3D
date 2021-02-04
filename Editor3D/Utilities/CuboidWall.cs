@@ -5,7 +5,7 @@ namespace Editor3D.Shapes
 {
     internal class CuboidWall
     {
-        private Triangle upperTriangle, lowerTriangle;
+        private readonly Triangle upperTriangle, lowerTriangle;
 
         public CuboidWall(Vector A, Vector B, Vector C, Vector D, Vector normalVector)
         {

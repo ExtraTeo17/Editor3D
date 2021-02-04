@@ -2,7 +2,7 @@
 {
     internal class Triangle
     {
-        private Vertex v1, v2, v3;
+        private readonly Vertex v1, v2, v3;
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {

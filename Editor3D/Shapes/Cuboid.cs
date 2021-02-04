@@ -20,11 +20,12 @@ namespace Editor3D.Shapes
 
         private void InitializeMesh(Vector position)
         {
-            InitializeWall(position, position.CloneMoved(a, 0, 0),
+            InitializeWall(position,
+                position.CloneMoved(a, 0, 0),
                 position.CloneMoved(a, 0, c),
                 position.CloneMoved(0, 0, c),
                 new Vector(0, -1, 0, 0));
-            // TODO: Initialize the rest of the walls
+            // TODO: Implement and think on whether vertices/vectors etc. should be references or values
         }
 
         private void InitializeWall(Vector pos1, Vector pos2, Vector pos3, Vector pos4, Vector normalVector)

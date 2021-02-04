@@ -4,7 +4,7 @@ namespace Editor3D.Utilities
 {
     internal class Vector
     {
-        public double x, y, z, w;
+        public readonly double x, y, z, w;
 
         public Vector(double x, double y, double z, double w)
         {

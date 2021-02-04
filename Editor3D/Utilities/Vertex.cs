@@ -6,8 +6,8 @@ namespace Editor3D.Utilities
 {
     class Vertex
     {
-        private Vector position;
-        private Vector normalVector;
+        private readonly Vector position;
+        private readonly Vector normalVector;
 
         public Vertex(Vector position, Vector normalVector)
         {
