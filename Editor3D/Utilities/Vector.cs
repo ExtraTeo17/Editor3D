@@ -24,5 +24,10 @@ namespace Editor3D.Utilities
             // TODO: Implement
             throw new NotImplementedException();
         }
+
+        internal Vector Clone()
+        {
+            return new Vector(x, y, z, w);
+        }
     }
 }

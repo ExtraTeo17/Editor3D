@@ -20,12 +20,36 @@ namespace Editor3D.Shapes
 
         private void InitializeMesh(Vector position)
         {
-            InitializeWall(position,
+            InitializeWall(position.Clone(),
                 position.CloneMoved(a, 0, 0),
                 position.CloneMoved(a, 0, c),
                 position.CloneMoved(0, 0, c),
                 new Vector(0, -1, 0, 0));
-            // TODO: Implement and think on whether vertices/vectors etc. should be references or values
+            InitializeWall(position.CloneMoved(0, b, 0),
+                position.CloneMoved(a, b, 0),
+                position.CloneMoved(a, 0, 0),
+                position.Clone(),
+                new Vector(0, 0, -1, 0));
+            InitializeWall(position.CloneMoved(a, b, 0),
+                position.CloneMoved(a, b, c),
+                position.CloneMoved(a, 0, c),
+                position.CloneMoved(a, 0, 0),
+                new Vector(1, 0, 0, 0));
+            InitializeWall(position.CloneMoved(a, b, c),
+                position.CloneMoved(0, b, c),
+                position.CloneMoved(0, 0, c),
+                position.CloneMoved(a, 0, c),
+                new Vector(0, 0, 1, 0));
+            InitializeWall(position.CloneMoved(0, b, c),
+                position.CloneMoved(0, b, 0),
+                position.Clone(),
+                position.CloneMoved(0, 0, c),
+                new Vector(-1, 0, 0, 0));
+            InitializeWall(position.CloneMoved(0, b, 0),
+                position.CloneMoved(a, b, 0),
+                position.CloneMoved(a, b, c),
+                position.CloneMoved(0, b, c),
+                new Vector(0, 1, 0, 0));
         }
 
         private void InitializeWall(Vector pos1, Vector pos2, Vector pos3, Vector pos4, Vector normalVector)
