@@ -21,8 +21,7 @@ namespace Editor3D.Utilities
 
         internal double DistanceTo(Vector pos)
         {
-            // TODO: Implement
-            throw new NotImplementedException();
+            return Math.Sqrt(((pos.x - x) * (pos.x - x)) + ((pos.y - y) * (pos.y - y)) + ((pos.z - z) * (pos.z - z)));
         }
 
         internal Vector Clone()
