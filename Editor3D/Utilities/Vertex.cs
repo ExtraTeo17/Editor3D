@@ -14,5 +14,10 @@ namespace Editor3D.Utilities
             this.position = position;
             this.normalVector = normalVector;
         }
+
+        internal void Render()
+        {
+            position.Render();
+        }
     }
 }

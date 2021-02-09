@@ -60,7 +60,10 @@ namespace Editor3D.Shapes
 
         internal void Render()
         {
-            
+            foreach (CuboidWall wall in walls)
+            {
+                wall.Render();
+            }
         }
     }
 }

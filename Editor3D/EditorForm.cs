@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace Editor3D
 {
-    public partial class EditorForm : Form
+    public partial class EditorForm : Form, IDisplayer
     {
         private const int FRAMES_PER_SECOND = 3;
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
@@ -71,6 +71,11 @@ namespace Editor3D
                 currentColorIndex = 0;
             }
             pictureBox1.Refresh();
+        }
+
+        public void Display(double x, double y)
+        {
+            throw new NotImplementedException();
         }
     }
 }

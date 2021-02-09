@@ -17,5 +17,11 @@ namespace Editor3D.Shapes
         {
             return new Triangle(pos1, pos2, pos3, normalVector);
         }
+
+        internal void Render()
+        {
+            upperTriangle.Render();
+            lowerTriangle.Render();
+        }
     }
 }
