@@ -15,9 +15,9 @@ namespace Editor3D.Utilities
             this.normalVector = normalVector;
         }
 
-        internal void Render()
+        internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            position.Render();
+            position.TransformAndRender(displayer, info);
         }
     }
 }

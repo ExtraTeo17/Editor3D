@@ -1,7 +1,7 @@
 ﻿using Editor3D.Utilities;
 using System;
 
-namespace Editor3D.Shapes
+namespace Editor3D.Utilities
 {
     internal class CuboidWall
     {
@@ -18,10 +18,10 @@ namespace Editor3D.Shapes
             return new Triangle(pos1, pos2, pos3, normalVector);
         }
 
-        internal void Render()
+        internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            upperTriangle.Render();
-            lowerTriangle.Render();
+            upperTriangle.Render(displayer, info);
+            lowerTriangle.Render(displayer, info);
         }
     }
 }

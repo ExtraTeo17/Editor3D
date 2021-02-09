@@ -9,6 +9,7 @@ namespace Editor3D.Shapes
     {
         private double a, b, c;
         private List<CuboidWall> walls;
+        private Matrix modelMatrix;
 
         public Cuboid(double a, double b, double c, Vector position)
         {
@@ -58,11 +59,12 @@ namespace Editor3D.Shapes
             walls.Add(wall);
         }
 
-        internal void Render()
+        internal void Render(IDisplayer displayer, PipelineInfo info)
         {
+            // TODO: Add model matrix to info
             foreach (CuboidWall wall in walls)
             {
-                wall.Render();
+                wall.Render(displayer, info);
             }
         }
     }

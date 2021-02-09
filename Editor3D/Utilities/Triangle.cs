@@ -13,11 +13,11 @@ namespace Editor3D.Utilities
             v3 = new Vertex(pos3, normalVector);
         }
 
-        internal void Render()
+        internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            v1.Render();
-            v2.Render();
-            v3.Render();
+            v1.Render(displayer, info);
+            v2.Render(displayer, info);
+            v3.Render(displayer, info);
         }
     }
 }

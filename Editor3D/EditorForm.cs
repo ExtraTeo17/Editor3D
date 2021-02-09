@@ -49,8 +49,13 @@ namespace Editor3D
         private void RenderCuboid()
         {
             Cuboid cuboid = new Cuboid(3, 4, 5, new Vector(0, 0, 0, 1));
-            cuboid.Render();
+            cuboid.Render(this, GeneratePipelineInfo());
             pictureBox1.Refresh();
+        }
+
+        private PipelineInfo GeneratePipelineInfo()
+        {
+            throw new NotImplementedException();
         }
 
         /**
