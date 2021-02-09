@@ -18,12 +18,21 @@ namespace Editor3D
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
         private Bitmap bitmap;
+        private List<Camera> cameras;
+        private int currentCameraIndex;
 
         public EditorForm()
         {
             InitializeComponent();
             PrepareBitmap();
+            PrepareCameras();
             RenderGraphicsPeriodically();
+        }
+
+        private void PrepareCameras()
+        {
+            cameras.Add(new Camera()); // TODO: Add camera parameters to the constructor
+            currentCameraIndex = 0;
         }
 
         private void PrepareBitmap()
@@ -55,6 +64,9 @@ namespace Editor3D
 
         private PipelineInfo GeneratePipelineInfo()
         {
+            /*Camera currentCamera = cameras[currentCameraIndex];
+            return new PipelineInfo(currentCamera.GetViewMatrix()
+                currentCamera.GetProjectionMatrix(),);*/
             throw new NotImplementedException();
         }
 

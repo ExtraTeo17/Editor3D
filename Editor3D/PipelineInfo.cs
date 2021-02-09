@@ -1,32 +1,48 @@
-﻿using System;
+﻿using Editor3D.Utilities;
+using System;
 
 namespace Editor3D
 {
     internal class PipelineInfo
     {
-        internal object GetModelMatrix()
+        private Matrix modelMatrix;
+        private readonly Matrix viewMatrix;
+        private readonly Matrix projectionMatrix;
+        private readonly int screenWidth;
+        private readonly int screenHeight;
+
+        internal PipelineInfo(Matrix viewMatrix, Matrix projectionMatrix,
+            int screenWidth, int screenHeight)
         {
-            throw new NotImplementedException();
+            this.viewMatrix = viewMatrix;
+            this.projectionMatrix = projectionMatrix;
+            this.screenWidth = screenWidth;
+            this.screenHeight = screenHeight;
         }
 
-        internal object GetViewMatrix()
+        internal Matrix GetModelMatrix()
         {
-            throw new NotImplementedException();
+            return modelMatrix;
         }
 
-        internal object GetProjectionMatrix()
+        internal Matrix GetViewMatrix()
         {
-            throw new NotImplementedException();
+            return viewMatrix;
         }
 
-        internal object GetScreenWidth()
+        internal Matrix GetProjectionMatrix()
         {
-            throw new NotImplementedException();
+            return projectionMatrix;
         }
 
-        internal object GetScreenHeight()
+        internal int GetScreenWidth()
         {
-            throw new NotImplementedException();
+            return screenWidth;
+        }
+
+        internal int GetScreenHeight()
+        {
+            return screenHeight;
         }
     }
 }
