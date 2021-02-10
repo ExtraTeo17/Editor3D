@@ -11,22 +11,19 @@ namespace Editor3D
         internal Camera(Vector cameraPosition, Vector observedPosition, double nearPlane,
             double farPlane, double fieldOfView, double aspect)
         {
-            PrepareViewMatrix(cameraPosition, observedPosition);
-            PrepareProjectionMatrix(nearPlane, farPlane, fieldOfView, aspect);
+            viewMatrix = GenerateViewMatrix(cameraPosition, observedPosition);
+            projectionMatrix = Matrix.Projection(nearPlane, farPlane, fieldOfView, aspect);
         }
 
-        private void PrepareViewMatrix(Vector cameraPosition, Vector observedPosition)
+        private Matrix GenerateViewMatrix(Vector cameraPosition, Vector observedPosition)
         {
             Vector upWorldDirection = new Vector(0, 1, 0, 0);
-            Vector fromCameraToObservedPoint = cameraPosition.DirectionTo(observedPosition);
-            Vector rightDirection = upWorldDirection.CrossProduct(fromCameraToObservedPoint);
-            Vector upDirection = fromCameraToObservedPoint.CrossProduct(rightDirection);
-        }
-
-        private void PrepareProjectionMatrix(double nearPlane, double farPlane, double fieldOfView,
-            double aspect)
-        {
-            throw new NotImplementedException();
+            Vector forwardDirection = cameraPosition.DirectionTo(observedPosition).Normalize();
+            Vector rightDirection = upWorldDirection.CrossProduct(forwardDirection).Normalize();
+            Vector upDirection = forwardDirection.CrossProduct(rightDirection).Normalize();
+            Matrix rotationMatrix = Matrix.Rotation(rightDirection, upDirection, forwardDirection);
+            Matrix transformationMatrix = Matrix.Translation(cameraPosition.Negated());
+            return rotationMatrix.MultipliedBy(transformationMatrix);
         }
 
         internal Matrix GetViewMatrix()

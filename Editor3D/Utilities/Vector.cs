@@ -28,7 +28,23 @@ namespace Editor3D.Utilities
             displayer.Display(x, y);
         }
 
+        internal Vector CrossProduct(Vector fromCameraToObservedPoint)
+        {
+            throw new NotImplementedException();
+        }
+
         internal Vector DirectionTo(Vector observedPosition)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Vector Normalize()
+        {
+            throw new NotImplementedException();
+            //return this;
+        }
+
+        internal object Negated()
         {
             throw new NotImplementedException();
         }
