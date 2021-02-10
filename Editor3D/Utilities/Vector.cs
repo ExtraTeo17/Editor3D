@@ -28,6 +28,11 @@ namespace Editor3D.Utilities
             displayer.Display(x, y);
         }
 
+        internal Vector DirectionTo(Vector observedPosition)
+        {
+            throw new NotImplementedException();
+        }
+
         private void MultiplyBy(object v)
         {
             throw new NotImplementedException();

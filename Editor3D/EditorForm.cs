@@ -31,7 +31,14 @@ namespace Editor3D
 
         private void PrepareCameras()
         {
-            cameras.Add(new Camera()); // TODO: Add camera parameters to the constructor
+            Vector cameraPosition = new Vector(20, 20, 10, 1);
+            Vector observedPosition = new Vector(0, 0, 0, 1);
+            double nearPlane = 15;
+            double farPlane = 45;
+            double fieldOfView = Math.PI / 4;
+            double aspect = bitmap.Width / bitmap.Height;
+            cameras.Add(new Camera(cameraPosition, observedPosition,
+                nearPlane, farPlane, fieldOfView, aspect));
             currentCameraIndex = 0;
         }
 
@@ -53,6 +60,7 @@ namespace Editor3D
         private void RenderGraphics(object sender, EventArgs e)
         {
             RenderCuboid();
+            // TODO: Add other objects
         }
 
         private void RenderCuboid()
@@ -64,10 +72,9 @@ namespace Editor3D
 
         private PipelineInfo GeneratePipelineInfo()
         {
-            /*Camera currentCamera = cameras[currentCameraIndex];
-            return new PipelineInfo(currentCamera.GetViewMatrix()
-                currentCamera.GetProjectionMatrix(),);*/
-            throw new NotImplementedException();
+            Camera currentCamera = cameras[currentCameraIndex];
+            return new PipelineInfo(currentCamera.GetViewMatrix(),
+                currentCamera.GetProjectionMatrix(), bitmap.Width, bitmap.Height);
         }
 
         /**

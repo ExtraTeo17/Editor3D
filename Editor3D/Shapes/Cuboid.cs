@@ -61,7 +61,7 @@ namespace Editor3D.Shapes
 
         internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            // TODO: Add model matrix to info
+            info.SetModelMatrix(modelMatrix);
             foreach (CuboidWall wall in walls)
             {
                 wall.Render(displayer, info);

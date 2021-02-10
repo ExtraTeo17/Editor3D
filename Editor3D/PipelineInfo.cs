@@ -44,5 +44,10 @@ namespace Editor3D
         {
             return screenHeight;
         }
+
+        internal void SetModelMatrix(Matrix modelMatrix)
+        {
+            this.modelMatrix = modelMatrix;
+        }
     }
 }
