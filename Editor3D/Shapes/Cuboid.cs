@@ -16,6 +16,7 @@ namespace Editor3D.Shapes
             this.a = a;
             this.b = b;
             this.c = c;
+            modelMatrix = Matrix.Unitary();
             InitializeMesh(position);
         }
 
