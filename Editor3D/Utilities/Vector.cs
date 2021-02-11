@@ -44,7 +44,7 @@ namespace Editor3D.Utilities
             //return this;
         }
 
-        internal object Negated()
+        internal Vector NegatedWithoutW()
         {
             throw new NotImplementedException();
         }

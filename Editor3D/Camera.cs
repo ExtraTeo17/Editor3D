@@ -22,7 +22,7 @@ namespace Editor3D
             Vector rightDirection = upWorldDirection.CrossProduct(forwardDirection).Normalize();
             Vector upDirection = forwardDirection.CrossProduct(rightDirection).Normalize();
             Matrix rotationMatrix = Matrix.Rotation(rightDirection, upDirection, forwardDirection);
-            Matrix transformationMatrix = Matrix.Translation(cameraPosition.Negated());
+            Matrix transformationMatrix = Matrix.Translation(cameraPosition.NegatedWithoutW());
             return rotationMatrix.MultipliedBy(transformationMatrix);
         }
 
