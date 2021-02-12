@@ -36,8 +36,8 @@ namespace Editor3D
         {
             Vector cameraPosition = new Vector(20, 20, 10, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
-            double nearPlane = 15;
-            double farPlane = 45;
+            double nearPlane = 0; // 15
+            double farPlane = 75; // 45
             double fieldOfView = Math.PI / 4;
             double aspect = pictureBox1.Width / pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,

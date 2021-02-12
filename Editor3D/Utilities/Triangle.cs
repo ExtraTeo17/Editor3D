@@ -112,7 +112,7 @@ namespace Editor3D.Utilities
                 z0 = z1;
                 z1 = tmp2;
             }
-            for (int x = x1; x <= x2; ++x)
+            for (int x = x1; x < x2; ++x)
             {
                 displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1)));
             }
