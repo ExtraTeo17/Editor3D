@@ -14,7 +14,7 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const int FRAMES_PER_SECOND = 30;
+        private const int FRAMES_PER_SECOND = 20;
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
         private Bitmap bitmap;
@@ -36,8 +36,8 @@ namespace Editor3D
         {
             Vector cameraPosition = new Vector(20, 20, 10, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
-            double nearPlane = 0; // 15
-            double farPlane = 75; // 45
+            double nearPlane = 10; // 15
+            double farPlane = 5000; // 45
             double fieldOfView = Math.PI / 4;
             double aspect = pictureBox1.Width / pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,
@@ -56,7 +56,7 @@ namespace Editor3D
             zBuffor = new double[pictureBox1.Width, pictureBox1.Height];
             //for (int i = 0; i < pictureBox1.Width; ++i)
             //    for (int j = 0; j < pictureBox1.Height; ++j)
-            //        zBuffor[i, j] = double.MaxValue;
+            //        zBuffor[i, j] = double.MinValue;
         }
 
         private void RenderGraphicsPeriodically()
@@ -76,8 +76,8 @@ namespace Editor3D
         private void RenderGraphics()
         {
             PrepareBitmap();
-            RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
             RenderCuboid(3, 4, 5, new Vector(i + 3, i + 5, (i / 3) + 4, 1), Color.Cyan);
+            RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
             i += 0.05;
             pictureBox1.Refresh();
             // TODO: Add other objects
@@ -121,7 +121,7 @@ namespace Editor3D
         {
             if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
             {
-                if (z >= zBuffor[x, y])
+                if (z > zBuffor[x, y])
                 {
                     bitmap.SetPixel(x, y, currentColor); // TODO: X and Z seem to be swapped
                     zBuffor[x, y] = z;

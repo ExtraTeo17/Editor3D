@@ -33,7 +33,7 @@ namespace Editor3D.Utilities
         {
             double screenX = Math.Round(((x + 1) * width) / 2);
             double screenY = Math.Round(((y + 1) * height) / 2);
-            double screenZ = Math.Round((z + 1) / 2);
+            double screenZ = (z + 1) / 2;
             return new Vector(screenX, screenY, screenZ, 1);
         }
 
