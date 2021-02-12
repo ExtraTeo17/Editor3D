@@ -14,20 +14,20 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const int FRAMES_PER_SECOND = 2;
+        private const int FRAMES_PER_SECOND = 30;
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
         private Bitmap bitmap;
         private List<Camera> cameras = new List<Camera>();
         private int currentCameraIndex;
-        private int i = 0;
+        private double i = 0;
 
         public EditorForm()
         {
             InitializeComponent();
             PrepareCameras();
-            //RenderGraphicsPeriodically();
-            RenderGraphics();
+            RenderGraphicsPeriodically();
+            //RenderGraphics();
         }
 
         private void PrepareCameras()
@@ -70,13 +70,13 @@ namespace Editor3D
         private void RenderGraphics()
         {
             PrepareBitmap();
-            RenderCuboid(i++);
+            RenderCuboid(i += 0.05);
             // TODO: Add other objects
         }
 
-        private void RenderCuboid(int i)
+        private void RenderCuboid(double i)
         {
-            Cuboid cuboid = new Cuboid(3, 4, 5, new Vector(0, 0, i, 1));
+            Cuboid cuboid = new Cuboid(3, 4, 5, new Vector(i, i, i / 3, 1));
             cuboid.Render(this, GeneratePipelineInfo());
             pictureBox1.Refresh();
         }
@@ -110,7 +110,10 @@ namespace Editor3D
 
         public void Display(int x, int y)
         {
-            bitmap.SetPixel(x, y, Color.Blue); // TODO: X and Z seem to be swapped
+            if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
+            {
+                bitmap.SetPixel(x, y, Color.Blue); // TODO: X and Z seem to be swapped
+            }
         }
     }
 }

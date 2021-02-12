@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Editor3D.Utilities
 {
@@ -24,6 +25,61 @@ namespace Editor3D.Utilities
                 (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y);
             RenderLineBresenham(displayer, (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y,
                 (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y);
+            RenderFillingScanLine(displayer, v1.GetScreenPosition(), v2.GetScreenPosition(), v3.GetScreenPosition());
+        }
+
+        public static int CompareByY(Vector v1, Vector v2)
+        {
+            return v1.y.CompareTo(v2.y);
+        }
+
+        private void RenderFillingScanLine(IDisplayer displayer, Vector v1, Vector v2, Vector v3) // TODO: improve filling of the rightmost segment areas
+        {
+            List<Vector> vertices = new List<Vector>() { v1, v2, v3 };
+            vertices.Sort(CompareByY);
+            if (vertices[1].y == vertices[2].y)
+            {
+                FillBottomTriangle(displayer, vertices[0], vertices[1], vertices[2]);
+            }
+            else if (vertices[0].y == vertices[1].y)
+            {
+                FillTopTriangle(displayer, vertices[0], vertices[1], vertices[2]);
+            }
+            else
+            {
+                double v4x = vertices[0].x + ((vertices[1].y - vertices[0].y) / (vertices[2].y - vertices[0].y)) * (vertices[2].x - vertices[0].x);
+                Vector v4 = new Vector(v4x, vertices[1].y, 1, 1);
+                FillBottomTriangle(displayer, vertices[0], vertices[1], v4);
+                FillTopTriangle(displayer, vertices[1], v4, vertices[2]);
+            }
+        }
+
+        private void FillTopTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3)
+        {
+            double d1 = (v3.x - v1.x) / (v3.y - v1.y);
+            double d2 = (v3.x - v2.x) / (v3.y - v2.y);
+            double x1 = v3.x;
+            double x2 = v3.x;
+            for (int scanline = (int)v3.y; scanline > v1.y; --scanline)
+            {
+                RenderLineBresenham(displayer, (int)x1, scanline, (int)x2, scanline);
+                x1 -= d1;
+                x2 -= d2;
+            }
+        }
+
+        private void FillBottomTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3)
+        {
+            double d1 = (v2.x - v1.x) / (v2.y - v1.y);
+            double d2 = (v3.x - v1.x) / (v3.y - v1.y);
+            double x1 = v1.x;
+            double x2 = v1.x;
+            for (int scanline = (int)v1.y; scanline <= v2.y; ++scanline)
+            {
+                RenderLineBresenham(displayer, (int)x1, scanline, (int)x2, scanline);
+                x1 += d1;
+                x2 += d2;
+            }
         }
 
         private void RenderLineBresenham(IDisplayer displayer, int x0, int y0, int x1, int y1)
