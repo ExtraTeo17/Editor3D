@@ -35,11 +35,11 @@ namespace Editor3D.Utilities
             {
                 displayer.SetColor(Color.Black);
                 RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
-                    (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y);
+                    (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);
                 RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
-                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y);
+                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);
                 RenderLineBresenham(displayer, (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y,
-                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y);
+                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);
             }
         }
 
@@ -48,7 +48,7 @@ namespace Editor3D.Utilities
             return v1.y.CompareTo(v2.y);
         }
 
-        private void RenderFillingScanLine(IDisplayer displayer, Vector v1, Vector v2, Vector v3) // TODO: improve filling of the rightmost segment areas
+        private void RenderFillingScanLine(IDisplayer displayer, Vector v1, Vector v2, Vector v3)
         {
             List<Vector> vertices = new List<Vector>() { v1, v2, v3 };
             vertices.Sort(CompareByY);
@@ -77,7 +77,9 @@ namespace Editor3D.Utilities
             double x2 = v3.x + 1;
             for (int scanline = (int)v3.y; scanline > v1.y; --scanline)
             {
-                RenderLineBresenham(displayer, (int)x1, scanline, (int)x2, scanline);
+                RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
+                    InterpolateZ(v3.z, v1.z, ((double)(scanline) - v1.y) / (double)((int)v3.y - v1.y)),
+                    InterpolateZ(v3.z, v2.z, ((double)(scanline) - v1.y) / (double)((int)v3.y - v1.y)));
                 x1 -= d1;
                 x2 -= d2;
             }
@@ -91,39 +93,58 @@ namespace Editor3D.Utilities
             double x2 = v1.x + 1;
             for (int scanline = (int)v1.y; scanline <= v2.y; ++scanline)
             {
-                RenderLineBresenham(displayer, (int)x1, scanline, (int)x2, scanline);
+                RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
+                    InterpolateZ(v2.z, v1.z, ((double)(scanline) - v1.y) / (double)((int)v2.y - v1.y)),
+                    InterpolateZ(v3.z, v1.z, ((double)(scanline) - v1.y) / (double)((int)v2.y - v1.y)));
                 x1 += d1;
                 x2 += d2;
             }
         }
 
-        private void RenderLineBresenham(IDisplayer displayer, int x0, int y0, int x1, int y1)
+        private void RenderHorizontalLine(IDisplayer displayer, int x1, int x2, int y, double z0, double z1)
+        {
+            if (x1 > x2)
+            {
+                int tmp = x1;
+                x1 = x2;
+                x2 = tmp;
+                double tmp2 = z0;
+                z0 = z1;
+                z1 = tmp2;
+            }
+            for (int x = x1; x <= x2; ++x)
+            {
+                displayer.Display(x, y, InterpolateZ(z0, z1, ((double)(x) - (double)x1) / (double)(x2 - x1)));
+            }
+        }
+
+        private void RenderLineBresenham(IDisplayer displayer, int x0, int y0, int x1, int y1, double z0, double z1)
         {
             if (Math.Abs(y1 - y0) < Math.Abs(x1 - x0))
             {
                 if (x0 > x1)
                 {
-                    RenderLineBresenhamLow(displayer, x1, y1, x0, y0);
+                    RenderLineBresenhamLow(displayer, x1, y1, x0, y0, z1, z0);
                 }
                 else
                 {
-                    RenderLineBresenhamLow(displayer, x0, y0, x1, y1);
+                    RenderLineBresenhamLow(displayer, x0, y0, x1, y1, z0, z1);
                 }
             }
             else
             {
                 if (y0 > y1)
                 {
-                    RenderLineBresenhamHigh(displayer, x1, y1, x0, y0);
+                    RenderLineBresenhamHigh(displayer, x1, y1, x0, y0, z1, z0);
                 }
                 else
                 {
-                    RenderLineBresenhamHigh(displayer, x0, y0, x1, y1);
+                    RenderLineBresenhamHigh(displayer, x0, y0, x1, y1, z0, z1);
                 }
             }
         }
 
-        private void RenderLineBresenhamLow(IDisplayer displayer, int x0, int y0, int x1, int y1)
+        private void RenderLineBresenhamLow(IDisplayer displayer, int x0, int y0, int x1, int y1, double z0, double z1)
         {
             int dx = x1 - x0;
             int dy = y1 - y0;
@@ -139,7 +160,7 @@ namespace Editor3D.Utilities
             int y = y0;
             for (int x = x0; x < x1; ++x)
             {
-                displayer.Display(x, y);
+                displayer.Display(x, y, InterpolateZ(z0, z1, ((double)(x) - (double)x0) / (double)(x1 - x0)));
                 if (d > 0)
                 {
                     y += yi;
@@ -152,7 +173,13 @@ namespace Editor3D.Utilities
             }
         }
 
-        private void RenderLineBresenhamHigh(IDisplayer displayer, int x0, int y0, int x1, int y1)
+        private double InterpolateZ(double z0, double z1, double q)
+        {
+            double x = (z0 * (1 - q)) + (z1 * q);
+            return x;
+        }
+
+        private void RenderLineBresenhamHigh(IDisplayer displayer, int x0, int y0, int x1, int y1, double z0, double z1)
         {
             int dx = x1 - x0;
             int dy = y1 - y0;
@@ -168,7 +195,7 @@ namespace Editor3D.Utilities
             int x = x0;
             for (int y = y0; y < y1; ++y)
             {
-                displayer.Display(x, y);
+                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(y) / (double)(y1 - y0)));
                 if (d > 0)
                 {
                     x += xi;

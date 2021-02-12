@@ -5,7 +5,7 @@ namespace Editor3D
 {
     internal interface IDisplayer
     {
-        void Display(int x, int y);
+        void Display(int x, int y, double z);
         void SetColor(Color color);
     }
 }
