@@ -8,7 +8,7 @@ namespace Editor3D.Shapes
     class Cuboid
     {
         private double a, b, c;
-        private List<CuboidWall> walls;
+        private List<CuboidWall> walls = new List<CuboidWall>();
         private Matrix modelMatrix;
 
         public Cuboid(double a, double b, double c, Vector position)
