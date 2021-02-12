@@ -1,7 +1,9 @@
-﻿namespace Editor3D
+﻿using Editor3D.Utilities;
+
+namespace Editor3D
 {
     internal interface IDisplayer
     {
-        void Display(double x, double y);
+        void Display(int x, int y);
     }
 }

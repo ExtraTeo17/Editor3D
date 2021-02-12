@@ -2,7 +2,7 @@
 
 namespace Editor3D.Utilities
 {
-    internal class Vector
+    public class Vector
     {
         public double x, y, z, w;
 
@@ -19,20 +19,21 @@ namespace Editor3D.Utilities
             return new Vector(x + a, y + b, z + c, w);
         }
 
-        internal void Render(IDisplayer displayer, PipelineInfo info)
+        internal Vector Render(IDisplayer displayer, PipelineInfo info)
         {
             Vector worldVector = info.GetModelMatrix().MultipliedBy(this);
             Vector viewVector = info.GetViewMatrix().MultipliedBy(worldVector);
             Vector ndcVector = info.GetProjectionMatrix().MultipliedBy(viewVector).DivideByW();
             Vector screenVector = ndcVector.InScreenSpace(info.GetScreenWidth(), info.GetScreenHeight());
-            displayer.Display(screenVector.x, screenVector.y);
+            displayer.Display((int)screenVector.x, (int)screenVector.y);
+            return screenVector;
         }
 
         private Vector InScreenSpace(double width, double height)
         {
-            double screenX = ((x + 1) * width) / 2;
-            double screenY = ((y + 1) * height) / 2;
-            double screenZ = (z + 1) / 2;
+            double screenX = Math.Round(((x + 1) * width) / 2);
+            double screenY = Math.Round(((y + 1) * height) / 2);
+            double screenZ = Math.Round((z + 1) / 2);
             return new Vector(screenX, screenY, screenZ, 1);
         }
 

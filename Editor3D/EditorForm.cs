@@ -26,8 +26,8 @@ namespace Editor3D
         {
             InitializeComponent();
             PrepareCameras();
-            RenderGraphicsPeriodically();
-            //RenderCuboid();
+            //RenderGraphicsPeriodically();
+            RenderGraphics();
         }
 
         private void PrepareCameras()
@@ -63,6 +63,11 @@ namespace Editor3D
         }
 
         private void RenderGraphics(object sender, EventArgs e)
+        {
+            RenderGraphics();
+        }
+
+        private void RenderGraphics()
         {
             PrepareBitmap();
             RenderCuboid(i++);
@@ -103,9 +108,9 @@ namespace Editor3D
             pictureBox1.Refresh();
         }
 
-        public void Display(double x, double y)
+        public void Display(int x, int y)
         {
-            bitmap.SetPixel((int)Math.Round(x), (int)Math.Round(y), Color.Blue); // TODO: X and Z seem to be swapped
+            bitmap.SetPixel(x, y, Color.Blue); // TODO: X and Z seem to be swapped
         }
     }
 }
