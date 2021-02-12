@@ -86,7 +86,8 @@ namespace Editor3D
         {
             Camera currentCamera = cameras[currentCameraIndex];
             return new PipelineInfo(currentCamera.GetViewMatrix(),
-                currentCamera.GetProjectionMatrix(), bitmap.Width, bitmap.Height);
+                currentCamera.GetProjectionMatrix(), bitmap.Width, bitmap.Height,
+                currentCamera.GetForwardDirection());
         }
 
         /**

@@ -46,6 +46,11 @@ namespace Editor3D.Utilities
             return this;
         }
 
+        internal double DotProduct(Vector vector)
+        {
+            return (x * vector.x) + (y * vector.y) + (z * vector.z);
+        }
+
         internal Vector CrossProduct(Vector vector)
         {
             double resultX = (y * vector.z) - (z * vector.y);

@@ -10,14 +10,16 @@ namespace Editor3D
         private readonly Matrix projectionMatrix;
         private readonly int screenWidth;
         private readonly int screenHeight;
+        private readonly Vector forwardDirection;
 
         internal PipelineInfo(Matrix viewMatrix, Matrix projectionMatrix,
-            int screenWidth, int screenHeight)
+            int screenWidth, int screenHeight, Vector forwardDirection)
         {
             this.viewMatrix = viewMatrix;
             this.projectionMatrix = projectionMatrix;
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
+            this.forwardDirection = forwardDirection;
         }
 
         internal Matrix GetModelMatrix()
@@ -43,6 +45,11 @@ namespace Editor3D
         internal int GetScreenHeight()
         {
             return screenHeight;
+        }
+
+        internal Vector GetForwardDirection()
+        {
+            return forwardDirection;
         }
 
         internal void SetModelMatrix(Matrix modelMatrix)

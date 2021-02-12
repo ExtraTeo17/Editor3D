@@ -7,6 +7,7 @@ namespace Editor3D
     {
         private Matrix viewMatrix;
         private Matrix projectionMatrix;
+        private Vector forwardDirection;
 
         internal Camera(Vector cameraPosition, Vector observedPosition, double nearPlane,
             double farPlane, double fieldOfView, double aspect)
@@ -18,7 +19,7 @@ namespace Editor3D
         private Matrix GenerateViewMatrix(Vector cameraPosition, Vector observedPosition)
         {
             Vector upWorldDirection = new Vector(0, 1, 0, 0);
-            Vector forwardDirection = observedPosition.DirectionTo(cameraPosition).Normalize();
+            forwardDirection = observedPosition.DirectionTo(cameraPosition).Normalize();
             Vector rightDirection = upWorldDirection.CrossProduct(forwardDirection).Normalize();
             Vector upDirection = forwardDirection.CrossProduct(rightDirection).Normalize();
             Matrix rotationMatrix = Matrix.Rotation(rightDirection, upDirection, forwardDirection);
@@ -34,6 +35,11 @@ namespace Editor3D
         internal Matrix GetProjectionMatrix()
         {
             return projectionMatrix;
+        }
+
+        internal Vector GetForwardDirection()
+        {
+            return forwardDirection;
         }
     }
 }

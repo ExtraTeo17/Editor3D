@@ -7,32 +7,40 @@ namespace Editor3D.Utilities
     internal class Triangle
     {
         private readonly Vertex v1, v2, v3;
+        private readonly Vector normalVector;
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {
             v1 = new Vertex(pos1, normalVector);
             v2 = new Vertex(pos2, normalVector);
             v3 = new Vertex(pos3, normalVector);
+            this.normalVector = normalVector;
         }
 
         internal void RenderFilling(IDisplayer displayer, PipelineInfo info)
         {
-            displayer.SetColor(Color.Blue);
-            v1.Render(displayer, info);
-            v2.Render(displayer, info);
-            v3.Render(displayer, info);
-            RenderFillingScanLine(displayer, v1.GetScreenPosition(), v2.GetScreenPosition(), v3.GetScreenPosition());
+            if (info.GetForwardDirection().DotProduct(normalVector) > 0)
+            {
+                displayer.SetColor(Color.Cyan);
+                v1.Render(displayer, info);
+                v2.Render(displayer, info);
+                v3.Render(displayer, info);
+                RenderFillingScanLine(displayer, v1.GetScreenPosition(), v2.GetScreenPosition(), v3.GetScreenPosition());
+            }
         }
 
         internal void RenderLines(IDisplayer displayer, PipelineInfo info)
         {
-            displayer.SetColor(Color.Black);
-            RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
-                (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y);
-            RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
-                (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y);
-            RenderLineBresenham(displayer, (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y,
-                (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y);
+            if (info.GetForwardDirection().DotProduct(normalVector) > 0)
+            {
+                displayer.SetColor(Color.Black);
+                RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
+                    (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y);
+                RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
+                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y);
+                RenderLineBresenham(displayer, (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y,
+                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y);
+            }
         }
 
         public static int CompareByY(Vector v1, Vector v2)
@@ -65,8 +73,8 @@ namespace Editor3D.Utilities
         {
             double d1 = (v3.x - v1.x) / (v3.y - v1.y);
             double d2 = (v3.x - v2.x) / (v3.y - v2.y);
-            double x1 = v3.x + 2;
-            double x2 = v3.x;
+            double x1 = v3.x + 1;
+            double x2 = v3.x + 1;
             for (int scanline = (int)v3.y; scanline > v1.y; --scanline)
             {
                 RenderLineBresenham(displayer, (int)x1, scanline, (int)x2, scanline);
@@ -79,8 +87,8 @@ namespace Editor3D.Utilities
         {
             double d1 = (v2.x - v1.x) / (v2.y - v1.y);
             double d2 = (v3.x - v1.x) / (v3.y - v1.y);
-            double x1 = v1.x + 2;
-            double x2 = v1.x;
+            double x1 = v1.x + 1;
+            double x2 = v1.x + 1;
             for (int scanline = (int)v1.y; scanline <= v2.y; ++scanline)
             {
                 RenderLineBresenham(displayer, (int)x1, scanline, (int)x2, scanline);
