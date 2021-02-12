@@ -1,5 +1,6 @@
 ﻿using Editor3D.Utilities;
 using System;
+using System.Drawing;
 
 namespace Editor3D.Utilities
 {
@@ -18,10 +19,10 @@ namespace Editor3D.Utilities
             return new Triangle(pos1, pos2, pos3, normalVector);
         }
 
-        internal void RenderFilling(IDisplayer displayer, PipelineInfo info)
+        internal void RenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
         {
-            upperTriangle.RenderFilling(displayer, info);
-            lowerTriangle.RenderFilling(displayer, info);
+            upperTriangle.RenderFilling(displayer, info, color);
+            lowerTriangle.RenderFilling(displayer, info, color);
         }
 
         internal void RenderLines(IDisplayer displayer, PipelineInfo info)

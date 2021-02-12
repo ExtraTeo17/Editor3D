@@ -14,7 +14,7 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const int FRAMES_PER_SECOND = 3;
+        private const int FRAMES_PER_SECOND = 30;
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
         private Bitmap bitmap;
@@ -76,17 +76,17 @@ namespace Editor3D
         private void RenderGraphics()
         {
             PrepareBitmap();
-            RenderCuboid(3, 4, 5, new Vector(i, i - 10, (i / 3) - 10, 1));
-            RenderCuboid(3, 4, 5, new Vector(i + 3, i + 5, (i / 3) + 4, 1));
+            RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
+            RenderCuboid(3, 4, 5, new Vector(i + 3, i + 5, (i / 3) + 4, 1), Color.Cyan);
             i += 0.05;
+            pictureBox1.Refresh();
             // TODO: Add other objects
         }
 
-        private void RenderCuboid(int x, int y, int z, Vector position)
+        private void RenderCuboid(int x, int y, int z, Vector position, Color color)
         {
-            Cuboid cuboid = new Cuboid(x, y, z, position);
+            Cuboid cuboid = new Cuboid(x, y, z, position, color);
             cuboid.Render(this, GeneratePipelineInfo());
-            pictureBox1.Refresh();
         }
 
         private PipelineInfo GeneratePipelineInfo()

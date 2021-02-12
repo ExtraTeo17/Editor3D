@@ -1,6 +1,7 @@
 ﻿using Editor3D.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace Editor3D.Shapes
@@ -10,12 +11,14 @@ namespace Editor3D.Shapes
         private double a, b, c;
         private List<CuboidWall> walls = new List<CuboidWall>();
         private Matrix modelMatrix;
+        private readonly Color color;
 
-        public Cuboid(double a, double b, double c, Vector position)
+        public Cuboid(double a, double b, double c, Vector position, Color color)
         {
             this.a = a;
             this.b = b;
             this.c = c;
+            this.color = color;
             modelMatrix = Matrix.Unitary();
             InitializeMesh(position);
         }
@@ -65,7 +68,7 @@ namespace Editor3D.Shapes
             info.SetModelMatrix(modelMatrix);
             foreach (CuboidWall wall in walls)
             {
-                wall.RenderFilling(displayer, info);
+                wall.RenderFilling(displayer, info, color);
             }
             foreach (CuboidWall wall in walls)
             {
