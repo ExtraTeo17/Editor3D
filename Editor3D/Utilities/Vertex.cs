@@ -17,7 +17,7 @@ namespace Editor3D.Utilities
 
         internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            position.TransformAndRender(displayer, info);
+            position.Render(displayer, info);
         }
     }
 }

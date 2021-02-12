@@ -4,7 +4,7 @@ namespace Editor3D.Utilities
 {
     internal class Vector
     {
-        public readonly double x, y, z, w;
+        public double x, y, z, w;
 
         public Vector(double x, double y, double z, double w)
         {
@@ -19,49 +19,67 @@ namespace Editor3D.Utilities
             return new Vector(x + a, y + b, z + c, w);
         }
 
-        internal void TransformAndRender(IDisplayer displayer, PipelineInfo info)
+        internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            MultiplyBy(info.GetModelMatrix());
-            MultiplyBy(info.GetViewMatrix());
-            MultiplyBy(info.GetProjectionMatrix());
-            TransformToScreenSpace(info.GetScreenWidth(), info.GetScreenHeight());
-            displayer.Display(x, y);
+            Vector worldVector = info.GetModelMatrix().MultipliedBy(this);
+            Vector viewVector = info.GetViewMatrix().MultipliedBy(worldVector);
+            Vector ndcVector = info.GetProjectionMatrix().MultipliedBy(viewVector).DivideByW();
+            Vector screenVector = ndcVector.InScreenSpace(info.GetScreenWidth(), info.GetScreenHeight());
+            displayer.Display(screenVector.x, screenVector.y);
         }
 
-        internal Vector CrossProduct(Vector fromCameraToObservedPoint)
+        private Vector InScreenSpace(double width, double height)
         {
-            throw new NotImplementedException();
+            double screenX = ((x + 1) * width) / 2;
+            double screenY = ((-y - 1) * height) / 2;
+            double screenZ = (z + 1) / 2;
+            return new Vector(screenX, screenY, screenZ, 1);
         }
 
-        internal Vector DirectionTo(Vector observedPosition)
+        private Vector DivideByW()
         {
-            throw new NotImplementedException();
+            x /= w;
+            y /= w;
+            z /= w;
+            w = 1;
+            return this;
+        }
+
+        internal Vector CrossProduct(Vector vector)
+        {
+            double resultX = (y * vector.z) - (z * vector.y);
+            double resultY = (z * vector.x) - (x * vector.z);
+            double resultZ = (x * vector.y) - (y * vector.x);
+            return new Vector(resultX, resultY, resultZ, 0);
+        }
+
+        internal Vector DirectionTo(Vector vector)
+        {
+            return new Vector(vector.x - x, vector.y - y, vector.z - z, 0);
         }
 
         internal Vector Normalize()
         {
-            throw new NotImplementedException();
-            //return this;
+            double magnitude = Magnitude();
+            x /= magnitude;
+            y /= magnitude;
+            z /= magnitude;
+            return this;
         }
 
         internal Vector NegatedWithoutW()
         {
-            throw new NotImplementedException();
-        }
-
-        private void MultiplyBy(object v)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void TransformToScreenSpace(object v1, object v2)
-        {
-            throw new NotImplementedException();
+            return new Vector(-x, -y, -z, w);
         }
 
         internal double DistanceTo(Vector pos)
         {
             return Math.Sqrt(((pos.x - x) * (pos.x - x)) + ((pos.y - y) * (pos.y - y)) + ((pos.z - z) * (pos.z - z)));
+        }
+
+        internal double Magnitude()
+        {
+            return Math.Sqrt((x * x) + (y * y) + (z * z));
         }
 
         internal Vector Clone()
