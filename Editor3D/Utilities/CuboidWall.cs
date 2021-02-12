@@ -18,10 +18,16 @@ namespace Editor3D.Utilities
             return new Triangle(pos1, pos2, pos3, normalVector);
         }
 
-        internal void Render(IDisplayer displayer, PipelineInfo info)
+        internal void RenderFilling(IDisplayer displayer, PipelineInfo info)
         {
-            upperTriangle.Render(displayer, info);
-            lowerTriangle.Render(displayer, info);
+            upperTriangle.RenderFilling(displayer, info);
+            lowerTriangle.RenderFilling(displayer, info);
+        }
+
+        internal void RenderLines(IDisplayer displayer, PipelineInfo info)
+        {
+            upperTriangle.RenderLines(displayer, info);
+            lowerTriangle.RenderLines(displayer, info);
         }
     }
 }

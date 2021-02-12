@@ -21,6 +21,7 @@ namespace Editor3D
         private List<Camera> cameras = new List<Camera>();
         private int currentCameraIndex;
         private double i = 0;
+        private Color currentColor = Color.Black;
 
         public EditorForm()
         {
@@ -112,8 +113,13 @@ namespace Editor3D
         {
             if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
             {
-                bitmap.SetPixel(x, y, Color.Blue); // TODO: X and Z seem to be swapped
+                bitmap.SetPixel(x, y, currentColor); // TODO: X and Z seem to be swapped
             }
+        }
+
+        public void SetColor(Color color)
+        {
+            this.currentColor = color;
         }
     }
 }

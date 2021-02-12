@@ -65,7 +65,11 @@ namespace Editor3D.Shapes
             info.SetModelMatrix(modelMatrix);
             foreach (CuboidWall wall in walls)
             {
-                wall.Render(displayer, info);
+                wall.RenderFilling(displayer, info);
+            }
+            foreach (CuboidWall wall in walls)
+            {
+                wall.RenderLines(displayer, info);
             }
         }
     }
