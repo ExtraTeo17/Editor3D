@@ -31,7 +31,7 @@ namespace Editor3D.Utilities
         private Vector InScreenSpace(double width, double height)
         {
             double screenX = ((x + 1) * width) / 2;
-            double screenY = ((-y - 1) * height) / 2;
+            double screenY = ((y + 1) * height) / 2;
             double screenZ = (z + 1) / 2;
             return new Vector(screenX, screenY, screenZ, 1);
         }

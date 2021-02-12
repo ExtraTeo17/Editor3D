@@ -18,7 +18,7 @@ namespace Editor3D
         private Matrix GenerateViewMatrix(Vector cameraPosition, Vector observedPosition)
         {
             Vector upWorldDirection = new Vector(0, 1, 0, 0);
-            Vector forwardDirection = cameraPosition.DirectionTo(observedPosition).Normalize();
+            Vector forwardDirection = observedPosition.DirectionTo(cameraPosition).Normalize();
             Vector rightDirection = upWorldDirection.CrossProduct(forwardDirection).Normalize();
             Vector upDirection = forwardDirection.CrossProduct(rightDirection).Normalize();
             Matrix rotationMatrix = Matrix.Rotation(rightDirection, upDirection, forwardDirection);

@@ -14,7 +14,7 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const int FRAMES_PER_SECOND = 5;
+        private const int FRAMES_PER_SECOND = 2;
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
         private Bitmap bitmap;
@@ -71,7 +71,7 @@ namespace Editor3D
 
         private void RenderCuboid(int i)
         {
-            Cuboid cuboid = new Cuboid(3, 4, 5, new Vector(i, 0, 0, 1));
+            Cuboid cuboid = new Cuboid(3, 4, 5, new Vector(0, 0, i, 1));
             cuboid.Render(this, GeneratePipelineInfo());
             pictureBox1.Refresh();
         }
@@ -105,15 +105,7 @@ namespace Editor3D
 
         public void Display(double x, double y)
         {
-            bitmap.SetPixel((int)Math.Round(x), -(int)Math.Round(y), Color.Blue); // TODO: Don't know why Y negated
-            bitmap.SetPixel((int)Math.Round(x) + 1, -(int)Math.Round(y), Color.Blue);
-            bitmap.SetPixel((int)Math.Round(x) - 1, -(int)Math.Round(y), Color.Blue);
-            bitmap.SetPixel((int)Math.Round(x), -(int)Math.Round(y) + 1, Color.Blue);
-            bitmap.SetPixel((int)Math.Round(x), -(int)Math.Round(y) - 1, Color.Blue);
-            bitmap.SetPixel((int)Math.Round(x) + 1, -(int)Math.Round(y) + 1, Color.Blue);
-            bitmap.SetPixel((int)Math.Round(x) + 1, -(int)Math.Round(y) - 1, Color.Blue);
-            bitmap.SetPixel((int)Math.Round(x) - 1, -(int)Math.Round(y) + 1, Color.Blue);
-            bitmap.SetPixel((int)Math.Round(x) - 1, -(int)Math.Round(y) - 1, Color.Blue);
+            bitmap.SetPixel((int)Math.Round(x), (int)Math.Round(y), Color.Blue); // TODO: X and Z seem to be swapped
         }
     }
 }
