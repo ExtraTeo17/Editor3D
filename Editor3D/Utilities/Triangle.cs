@@ -14,6 +14,7 @@ namespace Editor3D.Utilities
 
         private readonly Vertex v1, v2, v3;
         private readonly Vector normalVector;
+        private readonly GourandInfo gourandInfo;
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {
@@ -21,6 +22,7 @@ namespace Editor3D.Utilities
             v2 = new Vertex(pos2, normalVector);
             v3 = new Vertex(pos3, normalVector);
             this.normalVector = normalVector;
+            this.gourandInfo = new GourandInfo();
         }
 
         internal void RenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
@@ -30,9 +32,24 @@ namespace Editor3D.Utilities
                 v1.Render(displayer, info);
                 v2.Render(displayer, info);
                 v3.Render(displayer, info);
+                /*if (displayer.GetShading() == Shading.Flat)
+                {
+                    color = ComputeColorFlatShading();
+                }
+                else */if (displayer.GetShading() == Shading.Gourand)
+                {
+                    PrepareGourandVertexIntensities(color, info.GetLights(), info.GetCameraPosition());
+                }
                 RenderFillingScanLine(displayer, v1.GetScreenPosition(), v2.GetScreenPosition(), v3.GetScreenPosition(),
                     color, info.GetLights());
             }
+        }
+
+        private void PrepareGourandVertexIntensities(Color color, List<Light> lights, Vector cameraPos)
+        {
+            gourandInfo.SetV1GourandIntensity(ComputeColorPhongModel(color, lights, v1.GetWorldPosition(), cameraPos));
+            gourandInfo.SetV2GourandIntensity(ComputeColorPhongModel(color, lights, v2.GetWorldPosition(), cameraPos));
+            gourandInfo.SetV3GourandIntensity(ComputeColorPhongModel(color, lights, v3.GetWorldPosition(), cameraPos));
         }
 
         internal void RenderLines(IDisplayer displayer, PipelineInfo info)
@@ -84,10 +101,17 @@ namespace Editor3D.Utilities
             double x2 = v3.x + 1;
             for (int scanline = (int)v3.y; scanline > v1.y; --scanline)
             {
+                if (displayer.GetShading() == Shading.Gourand)
+                {
+                    gourandInfo.SetV3V1GourandIntensity(InterpolateColorGourandShading(v3.y, v1.y, scanline,
+                        gourandInfo.GetV3GourandIntensity(), gourandInfo.GetV1GourandIntensity()));
+                    gourandInfo.SetV3V2GourandIntensity(InterpolateColorGourandShading(v3.y, v1.y, scanline,
+                        gourandInfo.GetV2GourandIntensity(), gourandInfo.GetV1GourandIntensity()));
+                }
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
                     InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)),
                     InterpolateZ(v3.z, v2.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)),
-                    color, lights);
+                    color, lights, gourandInfo.GetV3V1GourandIntensity(), gourandInfo.GetV3V2GourandIntensity());
                 x1 -= d1;
                 x2 -= d2;
             }
@@ -102,17 +126,31 @@ namespace Editor3D.Utilities
             double x2 = v1.x + 1;
             for (int scanline = (int)v1.y; scanline <= v2.y; ++scanline)
             {
+                if (displayer.GetShading() == Shading.Gourand)
+                {
+                    gourandInfo.SetV2V1GourandIntensity(InterpolateColorGourandShading(v2.y, v1.y, scanline,
+                        gourandInfo.GetV2GourandIntensity(), gourandInfo.GetV1GourandIntensity()));
+                    gourandInfo.SetV3V1GourandIntensity(InterpolateColorGourandShading(v2.y, v1.y, scanline,
+                        gourandInfo.GetV3GourandIntensity(), gourandInfo.GetV1GourandIntensity()));
+                }
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
                     InterpolateZ(v2.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
                     InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
-                    color, lights);
+                    color, lights, gourandInfo.GetV2V1GourandIntensity(), gourandInfo.GetV3V1GourandIntensity());
                 x1 += d1;
                 x2 += d2;
             }
         }
 
+        private Color InterpolateColorGourandShading(double intervalEnd, double intervalStart, int intervalPos, Color colorEnd, Color colorStart)
+        {
+            double q = (intervalPos - intervalStart) / (intervalEnd - intervalStart);
+            Color color = ColorSummedWith(ColorMultipliedBy(colorStart, 1 - q), ColorMultipliedBy(colorEnd, q));
+            return color;
+        }
+
         private void RenderHorizontalLine(IDisplayer displayer, int x1, int x2, int y, double z0, double z1,
-            Color color, List<Light> lights)
+            Color color, List<Light> lights, Color gourandIntensity1, Color gourandIntensity2)
         {
             if (x1 > x2)
             {
@@ -122,23 +160,34 @@ namespace Editor3D.Utilities
                 double tmp2 = z0;
                 z0 = z1;
                 z1 = tmp2;
+                Color tmp3 = gourandIntensity1;
+                gourandIntensity1 = gourandIntensity2;
+                gourandIntensity2 = tmp3;
             }
             for (int x = x1; x < x2; ++x)
             {
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1)),
-                    ComputeColorPhongModel(color, lights));
+                if (displayer.GetShading() == Shading.Gourand)
+                {
+                    color = InterpolateColorGourandShading(x2, x1, x, gourandIntensity2, gourandIntensity1);
+                }
+                /*else if (displayer.GetShading() == Shading.Phong)
+                {
+                    color = ComputeColorPhongShading();
+                }*/
+                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1)), color); // TODO: consider changing to primitive types instead of passing Vector
             }
         }
 
-        private Color ComputeColorPhongModel(Color color, List<Light> lights) // TODO: Consider not rounding to ints upon every multiplying
+        private Color ComputeColorPhongModel(Color color, List<Light> lights, Vector pointPos, Vector cameraPos) // TODO: Consider not rounding to ints upon every multiplying
         {
-            Color intensity = Color.FromArgb(0, 0, 0);
+            Color intensity = Color.FromArgb(0, 0, 0); // TODO: try to change to color from parameter
             foreach (Light light in lights)
             {
-                Vector L = null;
-                Vector N = null;
-                Vector R = null;
-                Vector V = null;
+                Vector lightPos = light.GetPosition();
+                Vector L = pointPos.DirectionTo(lightPos).Normalize();
+                Vector N = normalVector;
+                Vector V = pointPos.DirectionTo(cameraPos).Normalize();
+                Vector R = (N.MultipliedBy(2.0 * L.DotProduct(N))).SubstractedBy(L).Normalize();
                 Color diffuse = ColorMultipliedBy(light.Id, kd * L.DotProduct(N));
                 Color specular = ColorMultipliedBy(light.Is, ks * Math.Pow(R.DotProduct(V), alfa));
                 Color diffuseSpecularSum = ColorSummedWith(diffuse, specular);

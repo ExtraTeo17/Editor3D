@@ -8,10 +8,12 @@ namespace Editor3D
         private Matrix viewMatrix;
         private Matrix projectionMatrix;
         private Vector forwardDirection;
+        private Vector position;
 
         internal Camera(Vector cameraPosition, Vector observedPosition, double nearPlane,
             double farPlane, double fieldOfView, double aspect)
         {
+            this.position = cameraPosition;
             viewMatrix = GenerateViewMatrix(cameraPosition, observedPosition);
             projectionMatrix = Matrix.Projection(nearPlane, farPlane, fieldOfView, aspect);
         }
@@ -40,6 +42,11 @@ namespace Editor3D
         internal Vector GetForwardDirection()
         {
             return forwardDirection;
+        }
+
+        internal Vector GetPosition()
+        {
+            return position;
         }
     }
 }

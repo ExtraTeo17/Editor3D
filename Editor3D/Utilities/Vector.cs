@@ -20,7 +20,7 @@ namespace Editor3D.Utilities
             return new Vector(x + a, y + b, z + c, w);
         }
 
-        internal Vector Render(IDisplayer displayer, PipelineInfo info)
+        internal (Vector, Vector) Render(IDisplayer displayer, PipelineInfo info)
         {
             Vector worldVector = info.GetModelMatrix().MultipliedBy(this);
             Vector viewVector = info.GetViewMatrix().MultipliedBy(worldVector);
@@ -30,7 +30,7 @@ namespace Editor3D.Utilities
             {
                 displayer.Display((int)screenVector.x, (int)screenVector.y, screenVector.z, Color.Black);
             }
-            return screenVector;
+            return (worldVector, screenVector);
         }
 
         private Vector InScreenSpace(double width, double height)
@@ -95,6 +95,16 @@ namespace Editor3D.Utilities
         internal Vector Clone()
         {
             return new Vector(x, y, z, w);
+        }
+
+        internal Vector MultipliedBy(double v)
+        {
+            return new Vector(v * x, v * y, v * z, 0);
+        }
+
+        internal Vector SubstractedBy(Vector vector)
+        {
+            return new Vector(x - vector.x, y - vector.y, z - vector.z, 0);
         }
     }
 }

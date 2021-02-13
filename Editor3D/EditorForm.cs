@@ -16,6 +16,7 @@ namespace Editor3D
     {
         private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 20;
+        private const Shading shading = Shading.Flat;
 
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
@@ -51,7 +52,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            lights.Add(new Light());
+            lights.Add(new Light(Color.White, Color.White, new Vector(12, 12, 5, 1)));
         }
 
         private void PrepareBitmap()
@@ -104,7 +105,8 @@ namespace Editor3D
             Camera currentCamera = cameras[currentCameraIndex];
             return new PipelineInfo(currentCamera.GetViewMatrix(),
                 currentCamera.GetProjectionMatrix(), bitmap.Width, bitmap.Height,
-                currentCamera.GetForwardDirection(), SHOULD_RENDER_LINES, lights);
+                currentCamera.GetForwardDirection(), SHOULD_RENDER_LINES, lights,
+                currentCamera.GetPosition());
         }
 
         /**
@@ -142,6 +144,11 @@ namespace Editor3D
         public void SetColor(Color color)
         {
             this.currentColor = color;
+        }
+
+        public Shading GetShading()
+        {
+            return shading;
         }
     }
 }

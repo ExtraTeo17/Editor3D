@@ -14,10 +14,11 @@ namespace Editor3D
         private readonly Vector forwardDirection;
         private readonly bool shouldRenderLines;
         private readonly List<Light> lights;
+        private readonly Vector cameraPosition;
 
         internal PipelineInfo(Matrix viewMatrix, Matrix projectionMatrix,
             int screenWidth, int screenHeight, Vector forwardDirection,
-            bool shouldRenderLines, List<Light> lights)
+            bool shouldRenderLines, List<Light> lights, Vector cameraPosition)
         {
             this.viewMatrix = viewMatrix;
             this.projectionMatrix = projectionMatrix;
@@ -26,6 +27,7 @@ namespace Editor3D
             this.forwardDirection = forwardDirection;
             this.shouldRenderLines = shouldRenderLines;
             this.lights = lights;
+            this.cameraPosition = cameraPosition;
         }
 
         internal Matrix GetModelMatrix()
@@ -51,6 +53,11 @@ namespace Editor3D
         internal int GetScreenHeight()
         {
             return screenHeight;
+        }
+
+        internal Vector GetCameraPosition()
+        {
+            return cameraPosition;
         }
 
         internal Vector GetForwardDirection()

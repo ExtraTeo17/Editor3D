@@ -7,5 +7,6 @@ namespace Editor3D
     {
         void Display(int x, int y, double z, Color color);
         void SetColor(Color color);
+        Shading GetShading();
     }
 }
