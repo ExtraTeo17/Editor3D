@@ -78,8 +78,8 @@ namespace Editor3D.Utilities
             for (int scanline = (int)v3.y; scanline > v1.y; --scanline)
             {
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
-                    InterpolateZ(v3.z, v1.z, ((double)(scanline) - v1.y) / (v3.y - v1.y)),
-                    InterpolateZ(v3.z, v2.z, ((double)(scanline) - v1.y) / (v3.y - v1.y)));
+                    InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)),
+                    InterpolateZ(v3.z, v2.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)));
                 x1 -= d1;
                 x2 -= d2;
             }
@@ -94,8 +94,8 @@ namespace Editor3D.Utilities
             for (int scanline = (int)v1.y; scanline <= v2.y; ++scanline)
             {
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
-                    InterpolateZ(v2.z, v1.z, ((double)(scanline) - v1.y) / (v2.y - v1.y)),
-                    InterpolateZ(v3.z, v1.z, ((double)(scanline) - v1.y) / (v2.y - v1.y)));
+                    InterpolateZ(v2.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
+                    InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)));
                 x1 += d1;
                 x2 += d2;
             }
@@ -160,7 +160,7 @@ namespace Editor3D.Utilities
             int y = y0;
             for (int x = x0; x < x1; ++x)
             {
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x0) / (double)(x1 - x0)));
+                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0)));
                 if (d > 0)
                 {
                     y += yi;

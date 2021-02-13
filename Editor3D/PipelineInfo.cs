@@ -11,15 +11,18 @@ namespace Editor3D
         private readonly int screenWidth;
         private readonly int screenHeight;
         private readonly Vector forwardDirection;
+        private readonly bool shouldRenderLines;
 
         internal PipelineInfo(Matrix viewMatrix, Matrix projectionMatrix,
-            int screenWidth, int screenHeight, Vector forwardDirection)
+            int screenWidth, int screenHeight, Vector forwardDirection,
+            bool shouldRenderLines)
         {
             this.viewMatrix = viewMatrix;
             this.projectionMatrix = projectionMatrix;
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
             this.forwardDirection = forwardDirection;
+            this.shouldRenderLines = shouldRenderLines;
         }
 
         internal Matrix GetModelMatrix()
@@ -55,6 +58,11 @@ namespace Editor3D
         internal void SetModelMatrix(Matrix modelMatrix)
         {
             this.modelMatrix = modelMatrix;
+        }
+
+        internal bool ShouldRenderLines()
+        {
+            return shouldRenderLines;
         }
     }
 }

@@ -70,9 +70,12 @@ namespace Editor3D.Shapes
             {
                 wall.RenderFilling(displayer, info, color);
             }
-            foreach (CuboidWall wall in walls)
+            if (info.ShouldRenderLines())
             {
-                wall.RenderLines(displayer, info);
+                foreach (CuboidWall wall in walls)
+                {
+                    wall.RenderLines(displayer, info);
+                }
             }
         }
     }

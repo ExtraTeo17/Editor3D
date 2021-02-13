@@ -25,7 +25,10 @@ namespace Editor3D.Utilities
             Vector viewVector = info.GetViewMatrix().MultipliedBy(worldVector);
             Vector ndcVector = info.GetProjectionMatrix().MultipliedBy(viewVector).DivideByW();
             Vector screenVector = ndcVector.InScreenSpace(info.GetScreenWidth(), info.GetScreenHeight());
-            displayer.Display((int)screenVector.x, (int)screenVector.y, screenVector.z);
+            if (info.ShouldRenderLines())
+            {
+                displayer.Display((int)screenVector.x, (int)screenVector.y, screenVector.z);
+            }
             return screenVector;
         }
 

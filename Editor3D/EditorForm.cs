@@ -14,7 +14,9 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
+        private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 20;
+
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
         private Bitmap bitmap;
@@ -36,8 +38,8 @@ namespace Editor3D
         {
             Vector cameraPosition = new Vector(20, 20, 10, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
-            double nearPlane = 10; // 15
-            double farPlane = 5000; // 45
+            double nearPlane = 1; // 15
+            double farPlane = 100; // 45
             double fieldOfView = Math.PI / 4;
             double aspect = pictureBox1.Width / pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,
@@ -94,7 +96,7 @@ namespace Editor3D
             Camera currentCamera = cameras[currentCameraIndex];
             return new PipelineInfo(currentCamera.GetViewMatrix(),
                 currentCamera.GetProjectionMatrix(), bitmap.Width, bitmap.Height,
-                currentCamera.GetForwardDirection());
+                currentCamera.GetForwardDirection(), SHOULD_RENDER_LINES);
         }
 
         /**
@@ -121,7 +123,7 @@ namespace Editor3D
         {
             if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
             {
-                if (z > zBuffor[x, y])
+                if (z >= zBuffor[x, y])
                 {
                     bitmap.SetPixel(x, y, currentColor); // TODO: X and Z seem to be swapped
                     zBuffor[x, y] = z;
