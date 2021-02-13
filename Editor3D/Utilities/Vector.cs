@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace Editor3D.Utilities
 {
@@ -27,7 +28,7 @@ namespace Editor3D.Utilities
             Vector screenVector = ndcVector.InScreenSpace(info.GetScreenWidth(), info.GetScreenHeight());
             if (info.ShouldRenderLines())
             {
-                displayer.Display((int)screenVector.x, (int)screenVector.y, screenVector.z);
+                displayer.Display((int)screenVector.x, (int)screenVector.y, screenVector.z, Color.Black);
             }
             return screenVector;
         }

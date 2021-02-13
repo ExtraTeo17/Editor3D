@@ -1,5 +1,6 @@
 ﻿using Editor3D.Utilities;
 using System;
+using System.Collections.Generic;
 
 namespace Editor3D
 {
@@ -12,10 +13,11 @@ namespace Editor3D
         private readonly int screenHeight;
         private readonly Vector forwardDirection;
         private readonly bool shouldRenderLines;
+        private readonly List<Light> lights;
 
         internal PipelineInfo(Matrix viewMatrix, Matrix projectionMatrix,
             int screenWidth, int screenHeight, Vector forwardDirection,
-            bool shouldRenderLines)
+            bool shouldRenderLines, List<Light> lights)
         {
             this.viewMatrix = viewMatrix;
             this.projectionMatrix = projectionMatrix;
@@ -23,6 +25,7 @@ namespace Editor3D
             this.screenHeight = screenHeight;
             this.forwardDirection = forwardDirection;
             this.shouldRenderLines = shouldRenderLines;
+            this.lights = lights;
         }
 
         internal Matrix GetModelMatrix()
@@ -53,6 +56,11 @@ namespace Editor3D
         internal Vector GetForwardDirection()
         {
             return forwardDirection;
+        }
+
+        internal List<Light> GetLights()
+        {
+            return lights;
         }
 
         internal void SetModelMatrix(Matrix modelMatrix)

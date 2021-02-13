@@ -6,6 +6,12 @@ namespace Editor3D.Utilities
 {
     internal class Triangle
     {
+        private const double kd = 0.3;
+        private const double ks = 0.4;
+        private const double ka = 0.3;
+        private const double alfa = 1;
+        private Color Ia = Color.Blue;
+
         private readonly Vertex v1, v2, v3;
         private readonly Vector normalVector;
 
@@ -21,11 +27,11 @@ namespace Editor3D.Utilities
         {
             if (info.GetForwardDirection().DotProduct(normalVector) > 0)
             {
-                displayer.SetColor(color);
                 v1.Render(displayer, info);
                 v2.Render(displayer, info);
                 v3.Render(displayer, info);
-                RenderFillingScanLine(displayer, v1.GetScreenPosition(), v2.GetScreenPosition(), v3.GetScreenPosition());
+                RenderFillingScanLine(displayer, v1.GetScreenPosition(), v2.GetScreenPosition(), v3.GetScreenPosition(),
+                    color, info.GetLights());
             }
         }
 
@@ -33,7 +39,6 @@ namespace Editor3D.Utilities
         {
             if (info.GetForwardDirection().DotProduct(normalVector) > 0)
             {
-                displayer.SetColor(Color.Black);
                 RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
                     (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);
                 RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
@@ -48,28 +53,30 @@ namespace Editor3D.Utilities
             return v1.y.CompareTo(v2.y);
         }
 
-        private void RenderFillingScanLine(IDisplayer displayer, Vector v1, Vector v2, Vector v3)
+        private void RenderFillingScanLine(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
+            Color color, List<Light> lights)
         {
             List<Vector> vertices = new List<Vector>() { v1, v2, v3 };
             vertices.Sort(CompareByY);
             if (vertices[1].y == vertices[2].y)
             {
-                FillBottomTriangle(displayer, vertices[0], vertices[1], vertices[2]);
+                FillBottomTriangle(displayer, vertices[0], vertices[1], vertices[2], color, lights);
             }
             else if (vertices[0].y == vertices[1].y)
             {
-                FillTopTriangle(displayer, vertices[0], vertices[1], vertices[2]);
+                FillTopTriangle(displayer, vertices[0], vertices[1], vertices[2], color, lights);
             }
             else
             {
                 double v4x = vertices[0].x + ((vertices[1].y - vertices[0].y) / (vertices[2].y - vertices[0].y)) * (vertices[2].x - vertices[0].x);
                 Vector v4 = new Vector(v4x, vertices[1].y, 1, 1);
-                FillBottomTriangle(displayer, vertices[0], vertices[1], v4);
-                FillTopTriangle(displayer, vertices[1], v4, vertices[2]);
+                FillBottomTriangle(displayer, vertices[0], vertices[1], v4, color, lights);
+                FillTopTriangle(displayer, vertices[1], v4, vertices[2], color, lights);
             }
         }
 
-        private void FillTopTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3)
+        private void FillTopTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
+            Color color, List<Light> lights)
         {
             double d1 = (v3.x - v1.x) / (v3.y - v1.y);
             double d2 = (v3.x - v2.x) / (v3.y - v2.y);
@@ -79,13 +86,15 @@ namespace Editor3D.Utilities
             {
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
                     InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)),
-                    InterpolateZ(v3.z, v2.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)));
+                    InterpolateZ(v3.z, v2.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)),
+                    color, lights);
                 x1 -= d1;
                 x2 -= d2;
             }
         }
 
-        private void FillBottomTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3)
+        private void FillBottomTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
+            Color color, List<Light> lights)
         {
             double d1 = (v2.x - v1.x) / (v2.y - v1.y);
             double d2 = (v3.x - v1.x) / (v3.y - v1.y);
@@ -95,13 +104,15 @@ namespace Editor3D.Utilities
             {
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
                     InterpolateZ(v2.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
-                    InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)));
+                    InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
+                    color, lights);
                 x1 += d1;
                 x2 += d2;
             }
         }
 
-        private void RenderHorizontalLine(IDisplayer displayer, int x1, int x2, int y, double z0, double z1)
+        private void RenderHorizontalLine(IDisplayer displayer, int x1, int x2, int y, double z0, double z1,
+            Color color, List<Light> lights)
         {
             if (x1 > x2)
             {
@@ -114,8 +125,53 @@ namespace Editor3D.Utilities
             }
             for (int x = x1; x < x2; ++x)
             {
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1)));
+                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1)),
+                    ComputeColorPhongModel(color, lights));
             }
+        }
+
+        private Color ComputeColorPhongModel(Color color, List<Light> lights) // TODO: Consider not rounding to ints upon every multiplying
+        {
+            Color intensity = Color.FromArgb(0, 0, 0);
+            foreach (Light light in lights)
+            {
+                Color diffuse = ColorMultipliedBy(light.Id, kd * ComputeLiN(light));
+                Color specular = ColorMultipliedBy(light.Is, ks * Math.Pow(ComputeRV(light), alfa));
+                Color diffuseSpecularSum = ColorSummedWith(diffuse, specular);
+                intensity = ColorSummedWith(intensity, diffuseSpecularSum);
+            }
+            return ColorSummedWith(ColorMultipliedBy(Ia, ka), ColorMultipliedBy(intensity, ComputeIf()));
+        }
+
+        private Color ColorSummedWith(Color color1, Color color2)
+        {
+            int red = color1.R + color2.R > 255 ? 255 : color1.R + color2.R;
+            int green = color1.G + color2.G > 255 ? 255 : color1.G + color2.G;
+            int blue = color1.B + color2.B > 255 ? 255 : color1.B + color2.B;
+            return Color.FromArgb(red, green, blue);
+        }
+
+        private Color ColorMultipliedBy(Color color, double multiplier)
+        {
+            int red = color.R * multiplier > 255 ? 255 : (int)((double)color.R * multiplier);
+            int green = color.G * multiplier > 255 ? 255 : (int)((double)color.G * multiplier);
+            int blue = color.B * multiplier > 255 ? 255 : (int)((double)color.B * multiplier);
+            return Color.FromArgb(red, green, blue);
+        }
+
+        private double ComputeLiN(Light light)
+        {
+            throw new NotImplementedException();
+        }
+
+        private double ComputeRV(Light light)
+        {
+            throw new NotImplementedException();
+        }
+
+        private double ComputeIf()
+        {
+            return 1;
         }
 
         private void RenderLineBresenham(IDisplayer displayer, int x0, int y0, int x1, int y1, double z0, double z1)
@@ -160,7 +216,7 @@ namespace Editor3D.Utilities
             int y = y0;
             for (int x = x0; x < x1; ++x)
             {
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0)));
+                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0)), Color.Black);
                 if (d > 0)
                 {
                     y += yi;
@@ -195,7 +251,7 @@ namespace Editor3D.Utilities
             int x = x0;
             for (int y = y0; y < y1; ++y)
             {
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0)));
+                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0)), Color.Black);
                 if (d > 0)
                 {
                     x += xi;

@@ -21,6 +21,7 @@ namespace Editor3D
         private int currentColorIndex = 0;
         private Bitmap bitmap;
         private List<Camera> cameras = new List<Camera>();
+        private List<Light> lights = new List<Light>();
         private int currentCameraIndex;
         private double i = 0;
         private Color currentColor = Color.Black;
@@ -30,8 +31,9 @@ namespace Editor3D
         {
             InitializeComponent();
             PrepareCameras();
-            RenderGraphicsPeriodically();
-            //RenderGraphics();
+            PrepareLights();
+            //RenderGraphicsPeriodically();
+            RenderGraphics();
         }
 
         private void PrepareCameras()
@@ -45,6 +47,11 @@ namespace Editor3D
             cameras.Add(new Camera(cameraPosition, observedPosition,
                 nearPlane, farPlane, fieldOfView, aspect));
             currentCameraIndex = 0;
+        }
+
+        private void PrepareLights()
+        {
+            lights.Add(new Light());
         }
 
         private void PrepareBitmap()
@@ -78,8 +85,9 @@ namespace Editor3D
         private void RenderGraphics()
         {
             PrepareBitmap();
+            //RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
+            //RenderCuboid(1, 1, 1, new Vector(12, 12, 5, 1), Color.Red);
             RenderCuboid(3, 4, 5, new Vector(i + 3, i + 5, (i / 3) + 4, 1), Color.Cyan);
-            RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
             i += 0.05;
             pictureBox1.Refresh();
             // TODO: Add other objects
@@ -96,7 +104,7 @@ namespace Editor3D
             Camera currentCamera = cameras[currentCameraIndex];
             return new PipelineInfo(currentCamera.GetViewMatrix(),
                 currentCamera.GetProjectionMatrix(), bitmap.Width, bitmap.Height,
-                currentCamera.GetForwardDirection(), SHOULD_RENDER_LINES);
+                currentCamera.GetForwardDirection(), SHOULD_RENDER_LINES, lights);
         }
 
         /**
@@ -119,13 +127,13 @@ namespace Editor3D
             pictureBox1.Refresh();
         }
 
-        public void Display(int x, int y, double z)
+        public void Display(int x, int y, double z, Color color)
         {
             if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
             {
                 if (z >= zBuffor[x, y])
                 {
-                    bitmap.SetPixel(x, y, currentColor); // TODO: X and Z seem to be swapped
+                    bitmap.SetPixel(x, y, color); // TODO: X and Z seem to be swapped
                     zBuffor[x, y] = z;
                 }
             }
