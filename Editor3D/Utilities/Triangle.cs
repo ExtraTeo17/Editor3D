@@ -135,8 +135,12 @@ namespace Editor3D.Utilities
             Color intensity = Color.FromArgb(0, 0, 0);
             foreach (Light light in lights)
             {
-                Color diffuse = ColorMultipliedBy(light.Id, kd * ComputeLiN(light));
-                Color specular = ColorMultipliedBy(light.Is, ks * Math.Pow(ComputeRV(light), alfa));
+                Vector L = null;
+                Vector N = null;
+                Vector R = null;
+                Vector V = null;
+                Color diffuse = ColorMultipliedBy(light.Id, kd * L.DotProduct(N));
+                Color specular = ColorMultipliedBy(light.Is, ks * Math.Pow(R.DotProduct(V), alfa));
                 Color diffuseSpecularSum = ColorSummedWith(diffuse, specular);
                 intensity = ColorSummedWith(intensity, diffuseSpecularSum);
             }
