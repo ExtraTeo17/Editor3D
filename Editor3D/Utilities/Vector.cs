@@ -6,6 +6,7 @@ namespace Editor3D.Utilities
     public class Vector
     {
         public double x, y, z, w;
+        private Color colorIntensity;
 
         public Vector(double x, double y, double z, double w)
         {
@@ -55,6 +56,16 @@ namespace Editor3D.Utilities
             return (x * vector.x) + (y * vector.y) + (z * vector.z);
         }
 
+        internal void SetColor(Color color)
+        {
+            this.colorIntensity = color;
+        }
+
+        internal Color GetColor()
+        {
+            return colorIntensity;
+        }
+
         internal Vector CrossProduct(Vector vector)
         {
             double resultX = (y * vector.z) - (z * vector.y);
@@ -71,6 +82,10 @@ namespace Editor3D.Utilities
         internal Vector Normalize()
         {
             double magnitude = Magnitude();
+            if (magnitude == 0)
+            {
+                return this;
+            }
             x /= magnitude;
             y /= magnitude;
             z /= magnitude;

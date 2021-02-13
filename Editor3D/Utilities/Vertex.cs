@@ -6,9 +6,8 @@ namespace Editor3D.Utilities
 {
     class Vertex
     {
-        private readonly Vector position;
+        private Vector position;
         private readonly Vector normalVector;
-        private Vector worldPosition;
         private Vector screenPosition;
 
         public Vertex(Vector position, Vector normalVector)
@@ -19,7 +18,7 @@ namespace Editor3D.Utilities
 
         internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            (worldPosition, screenPosition) = position.Render(displayer, info);
+            (position, screenPosition) = position.Render(displayer, info);
         }
 
         public Vector GetScreenPosition()
@@ -29,7 +28,7 @@ namespace Editor3D.Utilities
 
         public Vector GetWorldPosition()
         {
-            return worldPosition;
+            return position;
         }
     }
 }

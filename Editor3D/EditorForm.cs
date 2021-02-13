@@ -14,9 +14,9 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const bool SHOULD_RENDER_LINES = true;
-        private const int FRAMES_PER_SECOND = 20;
-        private const Shading shading = Shading.Flat;
+        private const bool SHOULD_RENDER_LINES = false;
+        private const int FRAMES_PER_SECOND = 30;
+        private const Shading shading = Shading.Gourand;
 
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
@@ -33,8 +33,8 @@ namespace Editor3D
             InitializeComponent();
             PrepareCameras();
             PrepareLights();
-            //RenderGraphicsPeriodically();
-            RenderGraphics();
+            RenderGraphicsPeriodically();
+            //RenderGraphics();
         }
 
         private void PrepareCameras()
@@ -52,7 +52,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            lights.Add(new Light(Color.White, Color.White, new Vector(12, 12, 5, 1)));
+            lights.Add(new Light(Color.White, Color.White, new Vector(17, 18, 10, 1)));
         }
 
         private void PrepareBitmap()
@@ -87,14 +87,14 @@ namespace Editor3D
         {
             PrepareBitmap();
             //RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
-            //RenderCuboid(1, 1, 1, new Vector(12, 12, 5, 1), Color.Red);
-            RenderCuboid(3, 4, 5, new Vector(i + 3, i + 5, (i / 3) + 4, 1), Color.Cyan);
-            i += 0.05;
+            RenderCuboid(0.4, 0.4, 0.4, new Vector(0, 0, 10, 1), Color.Yellow);
+            RenderCuboid(5, 5, 5, new Vector(-30 + i, 0, -5, 1), Color.Black);
+            i += 0.2;
             pictureBox1.Refresh();
             // TODO: Add other objects
         }
 
-        private void RenderCuboid(int x, int y, int z, Vector position, Color color)
+        private void RenderCuboid(double x, double y, double z, Vector position, Color color)
         {
             Cuboid cuboid = new Cuboid(x, y, z, position, color);
             cuboid.Render(this, GeneratePipelineInfo());
