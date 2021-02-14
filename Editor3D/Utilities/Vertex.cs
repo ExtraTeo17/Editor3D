@@ -31,5 +31,10 @@ namespace Editor3D.Utilities
         {
             return worldPosition;
         }
+
+        internal Vector GetNormalVector()
+        {
+            return normalVector;
+        }
     }
 }

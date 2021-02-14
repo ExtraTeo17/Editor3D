@@ -121,5 +121,10 @@ namespace Editor3D.Utilities
         {
             return new Vector(x - vector.x, y - vector.y, z - vector.z, 0);
         }
+
+        public override string ToString()
+        {
+            return "Vector [" + x + ", " + y + ", " + z + ", " + w + "]";
+        }
     }
 }

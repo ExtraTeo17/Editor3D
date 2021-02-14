@@ -14,17 +14,14 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const bool SHOULD_RENDER_LINES = true;
+        private const bool SHOULD_RENDER_LINES = false;
         private const int FRAMES_PER_SECOND = 25;
-        private const Shading shading = Shading.Flat;
+        private const Shading SHADING = Shading.Gourand;
 
-        private Color[] colors = { Color.Red, Color.Blue, Color.Green };
-        private int currentColorIndex = 0;
         private Bitmap bitmap;
         private List<Camera> cameras = new List<Camera>();
         private List<Light> lights = new List<Light>();
         private int currentCameraIndex;
-        private Color currentColor = Color.Black;
         private double[,] zBuffor;
         private List<Cuboid> cuboids = new List<Cuboid>();
         private List<Ball> balls = new List<Ball>();
@@ -38,12 +35,12 @@ namespace Editor3D
             GeneratePipelineInfo();
             PrepareScene();
             RenderGraphics();
-            UpdateScenePeriodically();
+            //UpdateScenePeriodically();
         }
 
         private void PrepareCameras()
         {
-            Vector cameraPosition = new Vector(20, 20, 20, 1);
+            Vector cameraPosition = new Vector(10, 10, 10, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
             double nearPlane = 1; // 15
             double farPlane = 100; // 45
@@ -56,7 +53,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            lights.Add(new Light(Color.White, Color.White, new Vector(17, 18, 10, 1)));
+            lights.Add(new Light(Color.White, Color.White, new Vector(0, 20, 20, 1)));
         }
 
         private void PrepareBitmap()
@@ -84,7 +81,7 @@ namespace Editor3D
 
         private void UpdateScene(object sender, EventArgs e)
         {
-            balls[0].Translate(0, 0, 0.1);
+            //balls[0].Translate(0, 0, 0.1);
             //cuboids[0].Translate(-0.1, 0, 0);
             RenderGraphics();
         }
@@ -104,21 +101,10 @@ namespace Editor3D
             pictureBox1.Refresh();
         }
 
-        private void RenderGraphicsLol()
-        {
-            //RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
-            //RenderCuboid(0.4, 0.4, 0.4, new Vector(0, 0, 10, 1), Color.Yellow, info);
-            //RenderCuboid(5, 5, 5, new Vector(-30 + i, 0, -5, 1), Color.Black, info);
-        }
-
         private void PrepareScene()
         {
             AddBall(5, Color.Cyan);
-            AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 5, 0, 0);
-            AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 0, 5, 0);
-            AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 0, 0, 5);
-            AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 0, 0, 0);
-            //AddCuboid(5, 5, 5, Color.Green, 0, 0, 0);
+            //AddCuboid(5, 5, 5, Color.Cyan, -2.5, -2.5, -2.5);
         }
 
 
@@ -145,26 +131,6 @@ namespace Editor3D
                 currentCamera.GetPosition());
         }
 
-        /**
-         * UNUSED
-         */
-        private void RenderColor(object sender, EventArgs e)
-        {
-            for (int i = 0; i < bitmap.Width; ++i)
-            {
-                for (int j = 0; j < bitmap.Height; ++j)
-                {
-                    bitmap.SetPixel(i, j, colors[currentColorIndex]);
-                }
-            }
-            ++currentColorIndex;
-            if (currentColorIndex > 2)
-            {
-                currentColorIndex = 0;
-            }
-            pictureBox1.Refresh();
-        }
-
         public void Display(int x, int y, double z, Color color)
         {
             if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
@@ -177,14 +143,9 @@ namespace Editor3D
             }
         }
 
-        public void SetColor(Color color)
-        {
-            this.currentColor = color;
-        }
-
         public Shading GetShading()
         {
-            return shading;
+            return SHADING;
         }
     }
 }

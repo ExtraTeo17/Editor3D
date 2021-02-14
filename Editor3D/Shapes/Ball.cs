@@ -84,8 +84,7 @@ namespace Editor3D.Shapes
             Vector pos1 = new Vector(0, radius, 0, 1);
             Vector pos2 = GeographicToScene(latDown, lonRight);
             Vector pos3 = GeographicToScene(latDown, lonLeft);
-            Vector normalVector = pos2.SubstractedBy(pos1).CrossProduct(pos3.SubstractedBy(pos1));
-            InitializeTriangle(pos1, pos2, pos3, normalVector);
+            InitializeTriangle(pos1, pos2, pos3);
         }
 
         internal void Translate(double x, double y, double z)
@@ -93,9 +92,9 @@ namespace Editor3D.Shapes
             modelMatrix.Translate(x, y, z);
         }
 
-        private void InitializeTriangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
+        private void InitializeTriangle(Vector pos1, Vector pos2, Vector pos3)
         {
-            Triangle triangle = new Triangle(pos1, pos2, pos3, normalVector);
+            Triangle triangle = new Triangle(pos1, pos2, pos3);
             tops.Add(triangle);
         }
 
@@ -104,8 +103,7 @@ namespace Editor3D.Shapes
             Vector pos1 = new Vector(0, -radius, 0, 1);
             Vector pos3 = GeographicToScene(latUp, lonLeft);
             Vector pos2 = GeographicToScene(latUp, lonRight);
-            Vector normalVector = pos2.SubstractedBy(pos1).CrossProduct(pos3.SubstractedBy(pos1));
-            InitializeTriangle(pos1, pos2, pos3, normalVector);
+            InitializeTriangle(pos1, pos2, pos3);
         }
 
         private void InitializeWall(double latUp, double latDown, double lonLeft, double lonRight)
@@ -114,8 +112,7 @@ namespace Editor3D.Shapes
             Vector pos2 = GeographicToScene(latUp, lonRight);
             Vector pos3 = GeographicToScene(latDown, lonRight);
             Vector pos4 = GeographicToScene(latDown, lonLeft);
-            Vector normalVector = pos2.SubstractedBy(pos1).CrossProduct(pos3.SubstractedBy(pos1));
-            InitializeWall(pos1, pos2, pos3, pos4, normalVector);
+            InitializeWall(pos1, pos2, pos3, pos4);
         }
 
         private Vector GeographicToScene(double lat, double lon)
@@ -126,9 +123,9 @@ namespace Editor3D.Shapes
             return new Vector(x, y, z, 1);
         }
 
-        private void InitializeWall(Vector pos1, Vector pos2, Vector pos3, Vector pos4, Vector normalVector)
+        private void InitializeWall(Vector pos1, Vector pos2, Vector pos3, Vector pos4)
         {
-            CuboidWall wall = new CuboidWall(pos1, pos2, pos3, pos4, normalVector);
+            CuboidWall wall = new CuboidWall(pos1, pos2, pos3, pos4);
             walls.Add(wall);
         }
 

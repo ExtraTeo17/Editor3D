@@ -10,13 +10,14 @@ namespace Editor3D.Utilities
 
         public CuboidWall(Vector A, Vector B, Vector C, Vector D, Vector normalVector)
         {
-            upperTriangle = InitializeTriangle(A, B, D, normalVector);
-            lowerTriangle = InitializeTriangle(B, C, D, normalVector);
+            upperTriangle = new Triangle(A, B, D, normalVector);
+            lowerTriangle = new Triangle(B, C, D, normalVector);
         }
 
-        private Triangle InitializeTriangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
+        public CuboidWall(Vector A, Vector B, Vector C, Vector D)
         {
-            return new Triangle(pos1, pos2, pos3, normalVector);
+            upperTriangle = new Triangle(A, B, D);
+            lowerTriangle = new Triangle(B, C, D);
         }
 
         internal void RenderFilling(IDisplayer displayer, PipelineInfo info, Color color)

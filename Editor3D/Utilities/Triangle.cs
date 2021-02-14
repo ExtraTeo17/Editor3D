@@ -7,14 +7,14 @@ namespace Editor3D.Utilities
     internal class Triangle
     {
         private const double kd = 0.3;
-        private const double ks = 2;
+        private const double ks = 0.3;
         private const double ka = 0.4;
-        private const double alfa = 3;
+        private const double alfa = 1;
         private Color Ia = Color.White;
 
         private readonly Vertex v1, v2, v3;
         private readonly Vector normalVector;
-        private readonly GourandInfo gourandInfo;
+        private readonly GourandInfo gourandInfo = new GourandInfo();
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {
@@ -22,7 +22,14 @@ namespace Editor3D.Utilities
             v2 = new Vertex(pos2, normalVector);
             v3 = new Vertex(pos3, normalVector);
             this.normalVector = normalVector;
-            this.gourandInfo = new GourandInfo();
+        }
+
+        public Triangle(Vector pos1, Vector pos2, Vector pos3)
+        {
+            v1 = new Vertex(pos1, pos1.Clone().Normalize());
+            v2 = new Vertex(pos2, pos2.Clone().Normalize());
+            v3 = new Vertex(pos3, pos3.Clone().Normalize());
+            this.normalVector = pos2.SubstractedBy(pos1).CrossProduct(pos3.SubstractedBy(pos1));
         }
 
         internal void RenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
@@ -45,8 +52,19 @@ namespace Editor3D.Utilities
         {
             foreach (Vertex vertex in vertices)
             {
-                vertex.GetScreenPosition().SetColor(ComputeColorPhongModel(color, lights, vertex.GetWorldPosition(), cameraPos));
+                vertex.GetScreenPosition().SetColor(ComputeColorPhongModel(color, lights, vertex.GetWorldPosition(), cameraPos, vertex.GetNormalVector()));
             }
+            if (DebugTriangle())
+            {
+                Console.WriteLine("V1 " + v1.GetScreenPosition().GetColor() + ", V2 " + v2.GetScreenPosition().GetColor() + ", V3 " + v3.GetScreenPosition().GetColor());
+            }
+        }
+
+        private bool DebugTriangle()
+        {
+            return v1.GetScreenPosition().x == 258 && v1.GetScreenPosition().y == 251
+                && v2.GetScreenPosition().x == 332 && v2.GetScreenPosition().y == 222
+                && v3.GetScreenPosition().x == 260 && v3.GetScreenPosition().y == 286;
         }
 
         internal void RenderLines(IDisplayer displayer, PipelineInfo info)
@@ -73,6 +91,10 @@ namespace Editor3D.Utilities
             vertices.Sort(CompareByY);
             List<Vector> positions = new List<Vector>() { vertices[0].GetScreenPosition(),
                 vertices[1].GetScreenPosition(), vertices[2].GetScreenPosition() };
+            if (displayer.GetShading() == Shading.Gourand)
+            {
+                PrepareGourandVertexIntensities(color, lights, cameraPos, vertices);
+            }
             if (positions[1].y == positions[2].y)
             {
                 FillBottomTriangle(displayer, positions[0], positions[1], positions[2], color, lights);
@@ -87,7 +109,6 @@ namespace Editor3D.Utilities
                 Vector v4 = new Vector(v4x, positions[1].y, 1, 1);
                 if (displayer.GetShading() == Shading.Gourand)
                 {
-                    PrepareGourandVertexIntensities(color, lights, cameraPos, vertices);
                     v4.SetColor(InterpolateColorGourandShading(positions[2].y, positions[0].y, (int)positions[1].y,
                         positions[2].GetColor(), positions[0].GetColor()));
                 }
@@ -186,14 +207,14 @@ namespace Editor3D.Utilities
             }
         }
 
-        private Color ComputeColorPhongModel(Color color, List<Light> lights, Vector pointPos, Vector cameraPos) // TODO: Consider not rounding to ints upon every multiplying
+        private Color ComputeColorPhongModel(Color color, List<Light> lights, Vector pointPos, Vector cameraPos, Vector pointNormalVector) // TODO: Consider not rounding to ints upon every multiplying
         {
             Color intensity = Color.FromArgb(0, 0, 0); // TODO: try to change to color from parameter
             foreach (Light light in lights)
             {
                 Vector lightPos = light.GetPosition();
                 Vector L = pointPos.DirectionTo(lightPos).Normalize();
-                Vector N = normalVector;
+                Vector N = pointNormalVector;
                 Vector V = pointPos.DirectionTo(cameraPos).Normalize();
                 Vector R = (N.MultipliedBy(2.0 * L.DotProduct(N))).SubstractedBy(L).Normalize();
                 Color diffuse = ColorMultipliedBy(light.Id, Math.Abs(kd * L.DotProduct(N)));
