@@ -7,8 +7,8 @@ namespace Editor3D.Utilities
     internal class Triangle
     {
         private const double kd = 0.3;
-        private const double ks = 0.3;
-        private const double ka = 0.4;
+        private const double ks = 0.4;
+        private const double ka = 0.3;
         private const double alfa = 1;
         private Color Ia = Color.White;
 
@@ -106,7 +106,8 @@ namespace Editor3D.Utilities
             else
             {
                 double v4x = positions[0].x + ((positions[1].y - positions[0].y) / (positions[2].y - positions[0].y)) * (positions[2].x - positions[0].x);
-                Vector v4 = new Vector(v4x, positions[1].y, 1, 1);
+                double v4z = InterpolateZ(positions[2].z, positions[0].z, Math.Abs((positions[1].y - positions[0].y) / (positions[2].y - positions[0].y)));
+                Vector v4 = new Vector(v4x, positions[1].y, v4z, 1);
                 if (displayer.GetShading() == Shading.Gourand)
                 {
                     v4.SetColor(InterpolateColorGourandShading(positions[2].y, positions[0].y, (int)positions[1].y,
@@ -217,8 +218,8 @@ namespace Editor3D.Utilities
                 Vector N = pointNormalVector;
                 Vector V = pointPos.DirectionTo(cameraPos).Normalize();
                 Vector R = (N.MultipliedBy(2.0 * L.DotProduct(N))).SubstractedBy(L).Normalize();
-                Color diffuse = ColorMultipliedBy(light.Id, Math.Abs(kd * L.DotProduct(N)));
-                Color specular = ColorMultipliedBy(light.Is, ks * Math.Abs(Math.Pow(R.DotProduct(V), alfa)));
+                Color diffuse = ColorMultipliedBy(light.Id, kd * L.DotProduct(N));
+                Color specular = ColorMultipliedBy(light.Is, ks * Math.Pow(R.DotProduct(V), alfa));
                 Color diffuseSpecularSum = ColorSummedWith(diffuse, specular);
                 intensity = ColorSummedWith(intensity, diffuseSpecularSum);
             }
@@ -238,7 +239,7 @@ namespace Editor3D.Utilities
             int red = color.R * multiplier > 255 ? 255 : (int)((double)color.R * multiplier);
             int green = color.G * multiplier > 255 ? 255 : (int)((double)color.G * multiplier);
             int blue = color.B * multiplier > 255 ? 255 : (int)((double)color.B * multiplier);
-            return Color.FromArgb(red, green, blue);
+            return Color.FromArgb(red < 0 ? 0 : red, green < 0 ? 0 : green, blue < 0 ? 0 : blue);
         }
 
         private double ComputeIf()
@@ -288,7 +289,7 @@ namespace Editor3D.Utilities
             int y = y0;
             for (int x = x0; x < x1; ++x)
             {
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0)), Color.Black);
+                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x0) / (double)(x1 - x0)), Color.Black);
                 if (d > 0)
                 {
                     y += yi;
@@ -303,7 +304,7 @@ namespace Editor3D.Utilities
 
         private double InterpolateZ(double z0, double z1, double q)
         {
-            double x = (z0 * (1 - q)) + (z1 * q);
+            double x = (z0 * (1.0 - q)) + (z1 * q);
             return x;
         }
 

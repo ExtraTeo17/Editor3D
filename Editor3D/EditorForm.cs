@@ -14,7 +14,7 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const bool SHOULD_RENDER_LINES = false;
+        private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 25;
         private const Shading SHADING = Shading.Gourand;
 
@@ -35,12 +35,12 @@ namespace Editor3D
             GeneratePipelineInfo();
             PrepareScene();
             RenderGraphics();
-            //UpdateScenePeriodically();
+            UpdateScenePeriodically();
         }
 
         private void PrepareCameras()
         {
-            Vector cameraPosition = new Vector(10, 10, 10, 1);
+            Vector cameraPosition = new Vector(20, 0, 0, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
             double nearPlane = 1; // 15
             double farPlane = 100; // 45
@@ -53,7 +53,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            lights.Add(new Light(Color.White, Color.White, new Vector(0, 20, 20, 1)));
+            lights.Add(new Light(Color.White, Color.White, new Vector(7, 0, 0, 1)));
         }
 
         private void PrepareBitmap()
@@ -81,7 +81,8 @@ namespace Editor3D
 
         private void UpdateScene(object sender, EventArgs e)
         {
-            //balls[0].Translate(0, 0, 0.1);
+            balls[1].Translate(0, 0, 0.1);
+            balls[0].Translate(0, 0, -0.1);
             //cuboids[0].Translate(-0.1, 0, 0);
             RenderGraphics();
         }
@@ -103,14 +104,17 @@ namespace Editor3D
 
         private void PrepareScene()
         {
-            AddBall(5, Color.Cyan);
+            AddBall(3, Color.Red, 11, 0, 10);
+            AddBall(5, Color.Blue, 0, 0, -10);
             //AddCuboid(5, 5, 5, Color.Cyan, -2.5, -2.5, -2.5);
         }
 
 
-        private void AddBall(double radius, Color color)
+        private void AddBall(double radius, Color color,
+            double transX, double transY, double transZ)
         {
             Ball ball = new Ball(radius, 8, 12, color);
+            ball.Translate(transX, transY, transZ);
             balls.Add(ball);
         }
 
