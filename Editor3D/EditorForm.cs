@@ -16,7 +16,7 @@ namespace Editor3D
     {
         private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 30;
-        private const Shading shading = Shading.Gourand;
+        private const Shading shading = Shading.Flat;
 
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
         private int currentColorIndex = 0;
@@ -33,8 +33,8 @@ namespace Editor3D
             InitializeComponent();
             PrepareCameras();
             PrepareLights();
-            RenderGraphicsPeriodically();
-            //RenderGraphics();
+            //RenderGraphicsPeriodically();
+            RenderGraphics();
         }
 
         private void PrepareCameras()
@@ -88,9 +88,9 @@ namespace Editor3D
             PrepareBitmap();
             //RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
             PipelineInfo info = GeneratePipelineInfo();
-            RenderCuboid(0.4, 0.4, 0.4, new Vector(0, 0, 10, 1), Color.Yellow, info);
-            RenderCuboid(5, 5, 5, new Vector(-30 + i, 0, -5, 1), Color.Black, info);
-            RenderBall(5, new Vector(-30 + i, 0, -5, 1), Color.Black, info);
+            //RenderCuboid(0.4, 0.4, 0.4, new Vector(0, 0, 10, 1), Color.Yellow, info);
+            //RenderCuboid(5, 5, 5, new Vector(-30 + i, 0, -5, 1), Color.Black, info);
+            RenderBall(5, new Vector(0, 0, 0, 1), Color.Cyan, info);
             i += 0.2;
             pictureBox1.Refresh();
             // TODO: Add other objects
@@ -98,7 +98,7 @@ namespace Editor3D
 
         private void RenderBall(double radius, Vector position, Color color, PipelineInfo info)
         {
-            Ball ball = new Ball(radius, position, color);
+            Ball ball = new Ball(radius, 8, 12, position, color);
             ball.Render(this, info);
         }
 
