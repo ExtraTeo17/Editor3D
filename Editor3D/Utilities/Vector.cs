@@ -21,17 +21,22 @@ namespace Editor3D.Utilities
             return new Vector(x + a, y + b, z + c, w);
         }
 
-        internal (Vector, Vector) Render(IDisplayer displayer, PipelineInfo info)
+        internal Vector MakeModel(PipelineInfo info)
         {
             Vector worldVector = info.GetModelMatrix().MultipliedBy(this);
-            Vector viewVector = info.GetViewMatrix().MultipliedBy(worldVector);
+            return worldVector;
+        }
+
+        internal Vector Render(IDisplayer displayer, PipelineInfo info)
+        {
+            Vector viewVector = info.GetViewMatrix().MultipliedBy(this);
             Vector ndcVector = info.GetProjectionMatrix().MultipliedBy(viewVector).DivideByW();
             Vector screenVector = ndcVector.InScreenSpace(info.GetScreenWidth(), info.GetScreenHeight());
             if (info.ShouldRenderLines())
             {
                 displayer.Display((int)screenVector.x, (int)screenVector.y, screenVector.z, Color.Black);
             }
-            return (worldVector, screenVector);
+            return screenVector;
         }
 
         private Vector InScreenSpace(double width, double height)

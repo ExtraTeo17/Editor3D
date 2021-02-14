@@ -34,7 +34,10 @@ namespace Editor3D.Utilities
 
         internal void RenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
         {
-            if (info.GetForwardDirection().DotProduct(normalVector) > 0)
+            v1.MakeModel(info);
+            v2.MakeModel(info);
+            v3.MakeModel(info);
+            if (ShouldBeDisplayed(v1, info))
             {
                 v1.Render(displayer, info);
                 v2.Render(displayer, info);
@@ -46,6 +49,11 @@ namespace Editor3D.Utilities
                 else */
                 RenderFillingScanLine(displayer, color, info.GetLights(), info.GetCameraPosition());
             }
+        }
+
+        private bool ShouldBeDisplayed(Vertex vertex, PipelineInfo info)
+        {
+            return v1.GetWorldPosition().DirectionTo(info.GetCameraPosition()).DotProduct(normalVector) > 0;
         }
 
         private void PrepareGourandVertexIntensities(Color color, List<Light> lights, Vector cameraPos, List<Vertex> vertices)
@@ -69,7 +77,7 @@ namespace Editor3D.Utilities
 
         internal void RenderLines(IDisplayer displayer, PipelineInfo info)
         {
-            if (info.GetForwardDirection().DotProduct(normalVector) > 0)
+            if (ShouldBeDisplayed(v1, info))
             {
                 RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
                     (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);

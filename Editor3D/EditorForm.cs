@@ -34,17 +34,17 @@ namespace Editor3D
             PrepareLights();
             GeneratePipelineInfo();
             PrepareScene();
-            RenderGraphics();
+            //RenderGraphics();
             UpdateScenePeriodically();
         }
 
         private void PrepareCameras()
         {
-            Vector cameraPosition = new Vector(20, 0, 0, 1);
+            Vector cameraPosition = new Vector(10, 10, 10, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
             double nearPlane = 1; // 15
             double farPlane = 100; // 45
-            double fieldOfView = Math.PI / 4;
+            double fieldOfView = Math.PI / 3;
             double aspect = pictureBox1.Width / pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,
                 nearPlane, farPlane, fieldOfView, aspect));
@@ -81,9 +81,9 @@ namespace Editor3D
 
         private void UpdateScene(object sender, EventArgs e)
         {
-            balls[1].Translate(0, 0, 0.1);
-            balls[0].Translate(0, 0, -0.1);
-            //cuboids[0].Translate(-0.1, 0, 0);
+            balls[0].Translate(0, 0, 0.1);
+            //balls[1].Translate(0, 0, -0.1);
+            //cuboids[0].Translate(0, 0, 0.05);
             RenderGraphics();
         }
 
@@ -104,7 +104,7 @@ namespace Editor3D
 
         private void PrepareScene()
         {
-            AddBall(3, Color.Red, 11, 0, 10);
+            //AddBall(3, Color.Red, 11, 0, 10);
             AddBall(5, Color.Blue, 0, 0, -10);
             //AddCuboid(5, 5, 5, Color.Cyan, -2.5, -2.5, -2.5);
         }

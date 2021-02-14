@@ -17,9 +17,14 @@ namespace Editor3D.Utilities
             this.normalVector = normalVector;
         }
 
+        internal void MakeModel(PipelineInfo info)
+        {
+            worldPosition = startPosition.MakeModel(info);
+        }
+
         internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            (worldPosition, screenPosition) = startPosition.Render(displayer, info);
+            screenPosition = worldPosition.Render(displayer, info);
         }
 
         public Vector GetScreenPosition()
