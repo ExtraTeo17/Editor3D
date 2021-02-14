@@ -15,7 +15,7 @@ namespace Editor3D
     public partial class EditorForm : Form, IDisplayer
     {
         private const bool SHOULD_RENDER_LINES = true;
-        private const int FRAMES_PER_SECOND = 30;
+        private const int FRAMES_PER_SECOND = 25;
         private const Shading shading = Shading.Flat;
 
         private Color[] colors = { Color.Red, Color.Blue, Color.Green };
@@ -43,7 +43,7 @@ namespace Editor3D
 
         private void PrepareCameras()
         {
-            Vector cameraPosition = new Vector(20, 20, 10, 1);
+            Vector cameraPosition = new Vector(20, 20, 20, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
             double nearPlane = 1; // 15
             double farPlane = 100; // 45
@@ -84,7 +84,7 @@ namespace Editor3D
 
         private void UpdateScene(object sender, EventArgs e)
         {
-            //balls[0].Translate(0.01, 0, 0);
+            balls[0].Translate(0, 0, 0.1);
             //cuboids[0].Translate(-0.1, 0, 0);
             RenderGraphics();
         }
@@ -117,6 +117,8 @@ namespace Editor3D
             AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 5, 0, 0);
             AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 0, 5, 0);
             AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 0, 0, 5);
+            AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 0, 0, 0);
+            //AddCuboid(5, 5, 5, Color.Green, 0, 0, 0);
         }
 
 
