@@ -13,18 +13,19 @@ namespace Editor3D.Shapes
         private Matrix modelMatrix;
         private readonly Color color;
 
-        public Cuboid(double a, double b, double c, Vector position, Color color)
+        public Cuboid(double a, double b, double c, Color color)
         {
             this.a = a;
             this.b = b;
             this.c = c;
             this.color = color;
             modelMatrix = Matrix.Unitary();
-            InitializeMesh(position);
+            InitializeMesh();
         }
 
-        private void InitializeMesh(Vector position)
+        private void InitializeMesh()
         {
+            Vector position = new Vector(0, 0, 0, 1);
             InitializeWall(position.Clone(),
                 position.CloneMoved(a, 0, 0),
                 position.CloneMoved(a, 0, c),
@@ -77,6 +78,11 @@ namespace Editor3D.Shapes
                     wall.RenderLines(displayer, info);
                 }
             }
+        }
+
+        internal void Translate(double x, double y, double z)
+        {
+            modelMatrix.Translate(x, y, z);
         }
     }
 }

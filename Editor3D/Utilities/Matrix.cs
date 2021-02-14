@@ -90,5 +90,12 @@ namespace Editor3D.Utilities
             double w = (matrix[0, 3] * vector.x) + (matrix[1, 3] * vector.y) + (matrix[2, 3] * vector.z) + (matrix[3, 3] * vector.w);
             return new Vector(x, y, z, w);
         }
+
+        internal void Translate(double x, double y, double z)
+        {
+            matrix[3, 0] += x;
+            matrix[3, 1] += y;
+            matrix[3, 2] += z;
+        }
     }
 }

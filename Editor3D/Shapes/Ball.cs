@@ -15,15 +15,15 @@ namespace Editor3D.Shapes
         private readonly Color color;
 
         public Ball(double radius, int latitudeDivisions, int longitudeDivisions,
-            Vector position, Color color)
+            Color color)
         {
             this.radius = radius;
             this.color = color;
             modelMatrix = Matrix.Unitary();
-            InitializeMesh(latitudeDivisions, longitudeDivisions, position);
+            InitializeMesh(latitudeDivisions, longitudeDivisions);
         }
 
-        private void InitializeMesh(double latitudes, double longitudes, Vector position)
+        private void InitializeMesh(double latitudes, double longitudes)
         {
             double equatorLat = Math.PI / 2.0;
             double latUp, lonLeft;
@@ -86,6 +86,11 @@ namespace Editor3D.Shapes
             Vector pos3 = GeographicToScene(latDown, lonLeft);
             Vector normalVector = pos2.SubstractedBy(pos1).CrossProduct(pos3.SubstractedBy(pos1));
             InitializeTriangle(pos1, pos2, pos3, normalVector);
+        }
+
+        internal void Translate(double x, double y, double z)
+        {
+            modelMatrix.Translate(x, y, z);
         }
 
         private void InitializeTriangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)

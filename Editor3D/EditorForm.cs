@@ -24,17 +24,21 @@ namespace Editor3D
         private List<Camera> cameras = new List<Camera>();
         private List<Light> lights = new List<Light>();
         private int currentCameraIndex;
-        private double i = 0;
         private Color currentColor = Color.Black;
         private double[,] zBuffor;
+        private List<Cuboid> cuboids = new List<Cuboid>();
+        private List<Ball> balls = new List<Ball>();
+        private PipelineInfo info;
 
         public EditorForm()
         {
             InitializeComponent();
             PrepareCameras();
             PrepareLights();
-            //RenderGraphicsPeriodically();
+            GeneratePipelineInfo();
+            PrepareScene();
             RenderGraphics();
+            UpdateScenePeriodically();
         }
 
         private void PrepareCameras()
@@ -69,50 +73,72 @@ namespace Editor3D
             //        zBuffor[i, j] = double.MinValue;
         }
 
-        private void RenderGraphicsPeriodically()
+        private void UpdateScenePeriodically()
         {
             Timer timer = new Timer();
             int millisecondsInOneSecond = 1000;
             timer.Interval = millisecondsInOneSecond / FRAMES_PER_SECOND;
-            timer.Tick += RenderGraphics;
+            timer.Tick += UpdateScene;
             timer.Start();
         }
 
-        private void RenderGraphics(object sender, EventArgs e)
+        private void UpdateScene(object sender, EventArgs e)
         {
+            //balls[0].Translate(0.01, 0, 0);
+            //cuboids[0].Translate(-0.1, 0, 0);
             RenderGraphics();
         }
 
         private void RenderGraphics()
         {
             PrepareBitmap();
+            foreach (Ball ball in balls)
+            {
+                ball.Render(this, info);
+            }
+            foreach (Cuboid cuboid in cuboids)
+            {
+                cuboid.Render(this, info);
+            }
+            // TODO: Add other objects
+            pictureBox1.Refresh();
+        }
+
+        private void RenderGraphicsLol()
+        {
             //RenderCuboid(3, 4, 5, new Vector(i - 50, i - 30, (i / 3) - 20, 1), Color.Blue);
-            PipelineInfo info = GeneratePipelineInfo();
             //RenderCuboid(0.4, 0.4, 0.4, new Vector(0, 0, 10, 1), Color.Yellow, info);
             //RenderCuboid(5, 5, 5, new Vector(-30 + i, 0, -5, 1), Color.Black, info);
-            RenderBall(5, new Vector(0, 0, 0, 1), Color.Cyan, info);
-            i += 0.2;
-            pictureBox1.Refresh();
-            // TODO: Add other objects
         }
 
-        private void RenderBall(double radius, Vector position, Color color, PipelineInfo info)
+        private void PrepareScene()
         {
-            Ball ball = new Ball(radius, 8, 12, position, color);
-            ball.Render(this, info);
+            AddBall(5, Color.Cyan);
+            AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 5, 0, 0);
+            AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 0, 5, 0);
+            AddCuboid(0.4, 0.4, 0.4, Color.Yellow, 0, 0, 5);
         }
 
-        private void RenderCuboid(double x, double y, double z, Vector position, Color color, PipelineInfo info)
+
+        private void AddBall(double radius, Color color)
         {
-            Cuboid cuboid = new Cuboid(x, y, z, position, color);
-            cuboid.Render(this, info);
+            Ball ball = new Ball(radius, 8, 12, color);
+            balls.Add(ball);
         }
 
-        private PipelineInfo GeneratePipelineInfo()
+        private void AddCuboid(double x, double y, double z, Color color,
+            double transX, double transY, double transZ)
+        {
+            Cuboid cuboid = new Cuboid(x, y, z, color);
+            cuboid.Translate(transX, transY, transZ);
+            cuboids.Add(cuboid);
+        }
+
+        private void GeneratePipelineInfo()
         {
             Camera currentCamera = cameras[currentCameraIndex];
-            return new PipelineInfo(currentCamera.GetViewMatrix(),
-                currentCamera.GetProjectionMatrix(), bitmap.Width, bitmap.Height,
+            info = new PipelineInfo(currentCamera.GetViewMatrix(),
+                currentCamera.GetProjectionMatrix(), pictureBox1.Width, pictureBox1.Height,
                 currentCamera.GetForwardDirection(), SHOULD_RENDER_LINES, lights,
                 currentCamera.GetPosition());
         }
