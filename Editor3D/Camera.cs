@@ -65,5 +65,10 @@ namespace Editor3D
         {
             cameraRotationMatrix.Rotate(degrees * Math.PI / 180, axis);
         }
+
+        internal void UpdateProperties(double aspect)
+        {
+            this.aspect = aspect;
+        }
     }
 }

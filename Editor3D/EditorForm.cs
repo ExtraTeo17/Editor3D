@@ -87,6 +87,8 @@ namespace Editor3D
             //balls[1].Translate(-0.1, 0, 0);
             //cuboids[0].Translate(0, 1, 0);
             cameras[0].Rotate(1, Axis.Y);
+            double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
+            cameras[0].UpdateProperties(aspect);
             RenderGraphics();
         }
 
