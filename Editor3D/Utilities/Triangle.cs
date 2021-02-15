@@ -17,6 +17,7 @@ namespace Editor3D.Utilities
         private readonly GourandInfo gourandInfo = new GourandInfo();
 
         private bool trace = false;
+        private bool specialTrace = false;
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {
@@ -84,10 +85,13 @@ namespace Editor3D.Utilities
                 RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
                     (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);
                 RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
-                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);
+                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y, v1.GetScreenPosition().z, v3.GetScreenPosition().z);
                 RenderLineBresenham(displayer, (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y,
-                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);
+                    (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y, v2.GetScreenPosition().z, v3.GetScreenPosition().z);
             }
+            if (trace)
+                Console.WriteLine("END OF IT ALL");
+            trace = false;
         }
 
         public static int CompareByY(Vertex v1, Vertex v2)
@@ -102,11 +106,12 @@ namespace Editor3D.Utilities
             List<Vector> positions = new List<Vector>() { vertices[0].GetScreenPosition(),
                 vertices[1].GetScreenPosition(), vertices[2].GetScreenPosition() };
 
-            if (v3.GetScreenPosition().x > 227 && v3.GetScreenPosition().x < 228 && v3.GetScreenPosition().y > 209 && v3.GetScreenPosition().y < 211
-                && v1.GetScreenPosition().x > 228 && v1.GetScreenPosition().x < 229)
+
+            if (v1.GetScreenPosition().x > 227 && v1.GetScreenPosition().x < 228 && v1.GetScreenPosition().y > 209 && v1.GetScreenPosition().y < 211
+                && v2.GetScreenPosition().x > 227)
             {
                 Console.WriteLine(v1.GetScreenPosition() + ", " + v2.GetScreenPosition() + ", " + v3.GetScreenPosition());
-                color = Color.Cyan;
+                color = Color.White;
                 Console.WriteLine(vertices[0].GetScreenPosition());
                 trace = true;
             }
@@ -126,7 +131,7 @@ namespace Editor3D.Utilities
             else
             {
                 double v4x = positions[0].x + ((positions[1].y - positions[0].y) / (positions[2].y - positions[0].y)) * (positions[2].x - positions[0].x);
-                double v4z = InterpolateZ(positions[2].z, positions[0].z, Math.Abs((positions[1].y - positions[0].y) / (positions[2].y - positions[0].y)));
+                double v4z = InterpolateZ(positions[0].z, positions[2].z, Math.Abs((positions[1].y - positions[0].y) / (positions[2].y - positions[0].y)));
                 Vector v4 = new Vector(v4x, positions[1].y, v4z, 1);
                 if (displayer.GetShading() == Shading.Gourand)
                 {
@@ -137,12 +142,19 @@ namespace Editor3D.Utilities
                 FillTopTriangle(displayer, positions[1], v4, positions[2], color, lights);
             }
 
-            trace = false;
+            //trace = false;
         }
 
         private void FillTopTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
             Color color, List<Light> lights)
         {
+            /*if (trace)
+            {
+                Console.WriteLine("BEFORE FILLING INTRO: " + v1 + ", " + v2 + ", " + v3);
+                Console.WriteLine("FILL FROM: (" + v1.x + ", " + v1.y + ") TO (" + v3.x + ", " + v3.y + ")");
+                Console.WriteLine("START V1.z: " + v1.z + ", V3.z: " + v3.z);
+            }*/
+
             double d1 = (v3.x - v1.x) / Math.Ceiling(v3.y - v1.y);
             double d2 = (v3.x - v2.x) / Math.Ceiling(v3.y - v2.y);
             double x1 = v3.x + 1;
@@ -165,11 +177,23 @@ namespace Editor3D.Utilities
                 x1 -= d1;
                 x2 -= d2;
             }
+
+            /*if (trace)
+            {
+                Console.WriteLine("FINISH");
+            }*/
         }
 
         private void FillBottomTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
             Color color, List<Light> lights)
         {
+            if (trace)
+            {
+                Console.WriteLine("BEFORE FILLING INTRO: " + v1 + ", " + v2 + ", " + v3);
+                Console.WriteLine("FILL FROM: (" + v3.x + ", " + v3.y + ") TO (" + v2.x + ", " + v2.y + ")");
+                Console.WriteLine("START V3.z: " + v3.z + ", V2.z: " + v2.z);
+            }
+
             double d1 = (v2.x - v1.x) / Math.Ceiling(v2.y - v1.y);
             double d2 = (v3.x - v1.x) / Math.Ceiling(v3.y - v1.y);
             double x1 = v1.x + 1;
@@ -185,14 +209,20 @@ namespace Editor3D.Utilities
                     rightIntensity = InterpolateColorGourandShading(v3.y, v1.y, scanline,
                         v3.GetColor(), v1.GetColor());
                 }
-                if (trace)
-                    Console.WriteLine("X1: " + x1 + ", X2: " + x2);
+                if (scanline == v2.y - 1)
+                    specialTrace = true;
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
                     InterpolateZ(v2.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
                     InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
                     color, lights, leftInsensity, rightIntensity);
+                specialTrace = false;
                 x1 += d1;
                 x2 += d2;
+            }
+
+            if (trace)
+            {
+                Console.WriteLine("FINISH");
             }
         }
 
@@ -206,6 +236,7 @@ namespace Editor3D.Utilities
         private void RenderHorizontalLine(IDisplayer displayer, int x1, int x2, int y, double z0, double z1,
             Color color, List<Light> lights, Color gourandIntensity1, Color gourandIntensity2)
         {
+            double tmpZ = 0;
             if (x1 > x2)
             {
                 int tmp = x1;
@@ -228,7 +259,12 @@ namespace Editor3D.Utilities
                 {
                     color = ComputeColorPhongShading();
                 }*/
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1)), color); // TODO: consider changing to primitive types instead of passing Vector
+                tmpZ = InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1));
+                if (specialTrace)
+                    Console.WriteLine("Z = " + tmpZ);
+                if (double.IsNaN(tmpZ))
+                    return;
+                displayer.Display(x, y, tmpZ, color); // TODO: consider changing to primitive types instead of passing Vector
             }
         }
 
@@ -311,9 +347,19 @@ namespace Editor3D.Utilities
             int incrV = 2 * dy;
             int incrDiag = 2 * (dy - dx);
             int y = y0;
+
+            if (trace)
+            {
+                Console.WriteLine("LINE HIGH FROM (" + x0 + ", " + y0 + ") TO (" + x1 + ", " + y1 + ")");
+                Console.WriteLine("START V1.z: " + z0 + ", V3.z: " + z1);
+            }
+
             for (int x = x0; x < x1; ++x)
             {
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(x - x0) / (double)(x1 - x0)), Color.Black);
+                double tmpZ = InterpolateZ(z0, z1, (double)(x - x0) / (double)(x1 - x0));
+                if (trace)
+                    Console.WriteLine("Z = " + tmpZ);
+                displayer.Display(x, y, tmpZ, Color.Black);
                 if (d > 0)
                 {
                     y += yi;
@@ -324,6 +370,9 @@ namespace Editor3D.Utilities
                     d += incrV;
                 }
             }
+
+            if (trace)
+                Console.WriteLine("END");
         }
 
         private double InterpolateZ(double z0, double z1, double q)
@@ -346,9 +395,12 @@ namespace Editor3D.Utilities
             int incrH = 2 * dx;
             int incrDiag = 2 * (dx - dy);
             int x = x0;
+
+            double tmpZ = 0;
             for (int y = y0; y < y1; ++y)
             {
-                displayer.Display(x, y, InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0)), Color.Black);
+                tmpZ = InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0));
+                displayer.Display(x, y, tmpZ, Color.Black);
                 if (d > 0)
                 {
                     x += xi;

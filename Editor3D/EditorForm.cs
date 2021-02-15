@@ -149,7 +149,7 @@ namespace Editor3D
         {
             if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
             {
-                if (z <= zBuffor[x, y])
+                if (z <= zBuffor[x, y] + 0.01)
                 {
                     bitmap.SetPixel(x, y, color);
                     zBuffor[x, y] = z;
