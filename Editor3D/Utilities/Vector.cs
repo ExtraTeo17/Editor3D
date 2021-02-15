@@ -68,9 +68,9 @@ namespace Editor3D.Utilities
 
         private bool IsInView(Vector c)
         {
-            return c.x >= -c.w && c.x <= c.w &&
-                c.y >= -c.w && c.y <= c.w &&
-                c.z >= -c.w && c.z <= c.w;
+            return c.x >= -10*c.w && c.x <= 10*c.w &&
+                c.y >= -10 * c.w && c.y <= 10 * c.w &&
+                c.z >= -10 * c.w && c.z <= 10 * c.w;
         }
 
         private Vector InScreenSpace(double width, double height)

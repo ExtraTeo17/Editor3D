@@ -28,6 +28,12 @@ namespace Editor3D
 
         public EditorForm()
         {
+            Debug();
+            //Release();
+        }
+
+        private void Debug()
+        {
             InitializeComponent();
             PrepareCameras();
             PrepareLights();
@@ -36,9 +42,52 @@ namespace Editor3D
             UpdateScenePeriodically();
         }
 
+        private void Release()
+        {
+            InitializeComponent();
+            PrepareTrackCameras();
+            PrepareTrackLights();
+            PrepareTrackScene();
+            RenderGraphics();
+            //UpdateTrackScenePeriodically();
+        }
+
+        private void PrepareTrackLights()
+        {
+        }
+
+        private void PrepareTrackCameras()
+        {
+            PrepareStaticCamera();
+            PrepareSpyingCamera();
+            PrepareMovingCamera();
+            currentCameraIndex = 0;
+        }
+
+        private void PrepareMovingCamera()
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void PrepareSpyingCamera()
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void PrepareStaticCamera()
+        {
+            Vector cameraPosition = new Vector(600, 500, 900, 1);
+            Vector observedPosition = new Vector(0, 0, 0, 1);
+            double nearPlane = 1; // 15
+            double farPlane = 2000; // 45
+            double fieldOfView = Math.PI * 45 / 180;
+            double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
+            cameras.Add(new Camera(cameraPosition, observedPosition,
+                nearPlane, farPlane, fieldOfView, aspect));
+        }
+
         private void PrepareCameras()
         {
-            //Vector cameraPosition = new Vector(600, 500, 900, 1);
             Vector cameraPosition = new Vector(0, 0, 0, 1);
             Vector observedPosition = new Vector(0, 0, -40, 1);
             double nearPlane = 1; // 15
@@ -78,6 +127,15 @@ namespace Editor3D
             timer.Start();
         }
 
+        private void UpdateTrackScenePeriodically()
+        {
+            Timer timer = new Timer();
+            int millisecondsInOneSecond = 1000;
+            timer.Interval = millisecondsInOneSecond / FRAMES_PER_SECOND;
+            timer.Tick += UpdateTrackScene;
+            timer.Start();
+        }
+
         private void UpdateScene(object sender, EventArgs e)
         {
             //balls[0].Translate(0, 1, 0);
@@ -86,10 +144,25 @@ namespace Editor3D
             //balls[0].Rotate(1, Axis.Z);
             //balls[1].Translate(-0.1, 0, 0);
             //cuboids[0].Translate(0, 1, 0);
-            cameras[0].Rotate(1, Axis.Y);
-            double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
-            cameras[0].UpdateProperties(aspect);
+            //cameras[0].Rotate(1, Axis.Y);
+            //double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
+            //cameras[0].UpdateProperties(aspect);
+            UpdateCameras();
             RenderGraphics();
+        }
+
+        private void UpdateTrackScene(object sender, EventArgs e)
+        {
+            UpdateCameras();
+            RenderGraphics();
+        }
+
+        private void UpdateCameras()
+        {
+            foreach (Camera camera in cameras)
+            {
+                camera.UpdateProperties((double)pictureBox1.Width / (double)pictureBox1.Height);
+            }
         }
 
         private void RenderGraphics()
@@ -107,15 +180,14 @@ namespace Editor3D
             pictureBox1.Refresh();
         }
 
-        private void PrepareScene()
+        private void PrepareScene() // WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
         {
-            //AddBall(3, Color.Red, 11, 0, 10);
             AddBall(10, Color.Green, 0, 0, -40);
-            //AddBall(10, Color.Cyan, -20, 0, -20);
-            AddCuboid(2, 2, 2, Color.Pink, -15 - 1, 0 - 1, -40 - 1);
-            //PrepareRoomWalls();
-            //AddCuboid(100, 100, 100, Color.Red, 100, 0, 100);
-            //PrepareTrack();
+        }
+
+        private void PrepareTrackScene()
+        {
+            PrepareTrack();
         }
 
         private void PrepareTrack()

@@ -69,7 +69,7 @@ namespace Editor3D.Utilities
         private void ApplyNormalVectorRotations()
         {
             this.normalVector = v2.GetWorldPosition().SubstractedBy(v1.GetWorldPosition())
-                .CrossProduct(v3.GetWorldPosition().SubstractedBy(v1.GetWorldPosition()));
+                .CrossProduct(v3.GetWorldPosition().SubstractedBy(v1.GetWorldPosition())).Normalize();
         }
 
         private bool ShouldBeDisplayed(Vertex vertex, PipelineInfo info)
