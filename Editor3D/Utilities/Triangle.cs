@@ -21,18 +21,18 @@ namespace Editor3D.Utilities
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {
-            v1 = new Vertex(pos1, normalVector);
-            v2 = new Vertex(pos2, normalVector);
-            v3 = new Vertex(pos3, normalVector);
+            v1 = new Vertex(pos1, normalVector, false);
+            v2 = new Vertex(pos2, normalVector, false);
+            v3 = new Vertex(pos3, normalVector, false);
             this.normalVector = normalVector;
         }
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3)
         {
-            v1 = new Vertex(pos1, pos1.Clone().Normalize());
-            v2 = new Vertex(pos2, pos2.Clone().Normalize());
-            v3 = new Vertex(pos3, pos3.Clone().Normalize());
-            this.normalVector = pos2.SubstractedBy(pos1).CrossProduct(pos3.SubstractedBy(pos1));
+            v1 = new Vertex(pos1, pos1.Clone().Normalize(), true);
+            v2 = new Vertex(pos2, pos2.Clone().Normalize(), true);
+            v3 = new Vertex(pos3, pos3.Clone().Normalize(), true);
+            this.normalVector = pos2.SubstractedBy(pos1).CrossProduct(pos3.SubstractedBy(pos1)).Normalize();
         }
 
         internal bool CheckRenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
@@ -40,7 +40,11 @@ namespace Editor3D.Utilities
             v1.MakeModel(info);
             v2.MakeModel(info);
             v3.MakeModel(info);
-            ApplyNormalVectorRotations();
+            UpdateNormalVector();
+            if (!v1.IsSmooth())
+            {
+                UpdateSharpEdges();
+            }
             if (ShouldBeDisplayed(v1, info))
             {
                 this.shouldBeDisplayed = true;
@@ -60,13 +64,20 @@ namespace Editor3D.Utilities
             return true;
         }
 
+        private void UpdateSharpEdges()
+        {
+            v1.SetNormalVector(normalVector.Clone());
+            v2.SetNormalVector(normalVector.Clone());
+            v3.SetNormalVector(normalVector.Clone());
+        }
+
         internal void RenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
         {
             if (shouldBeDisplayed)
                 RenderFillingScanLine(displayer, color, info.GetLights(), info.GetCameraPosition());
         }
 
-        private void ApplyNormalVectorRotations()
+        private void UpdateNormalVector()
         {
             this.normalVector = v2.GetWorldPosition().SubstractedBy(v1.GetWorldPosition())
                 .CrossProduct(v3.GetWorldPosition().SubstractedBy(v1.GetWorldPosition())).Normalize();

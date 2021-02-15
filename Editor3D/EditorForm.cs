@@ -28,8 +28,8 @@ namespace Editor3D
 
         public EditorForm()
         {
-            Debug();
-            //Release();
+            //Debug();
+            Release();
         }
 
         private void Debug()
@@ -101,7 +101,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            //lights.Add(new Light(Color.White, Color.White, new Vector(-15, 0, -40, 1)));
+            lights.Add(new Light(Color.White, Color.White, new Vector(-20, 0, -25, 1)));
         }
 
         private void PrepareBitmap()
@@ -140,10 +140,11 @@ namespace Editor3D
         {
             //balls[0].Translate(0, 1, 0);
             //balls[0].Rotate(1, Axis.X);
-            balls[0].Rotate(1, Axis.Y);
+            //balls[0].Rotate(1, Axis.Y);
             //balls[0].Rotate(1, Axis.Z);
             //balls[1].Translate(-0.1, 0, 0);
             //cuboids[0].Translate(0, 1, 0);
+            cuboids[0].Rotate(1, Axis.Y);
             //cameras[0].Rotate(1, Axis.Y);
             //double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             //cameras[0].UpdateProperties(aspect);
@@ -182,7 +183,8 @@ namespace Editor3D
 
         private void PrepareScene() // WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
         {
-            AddBall(10, Color.Green, 0, 0, -40);
+            //AddBall(10, Color.Green, -20, 0, -40);
+            AddCuboid(10, 10, 10, Color.Green, -20, -10, -40);
         }
 
         private void PrepareTrackScene()

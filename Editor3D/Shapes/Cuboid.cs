@@ -28,35 +28,35 @@ namespace Editor3D.Shapes
         private void InitializeMesh()
         {
             Vector position = new Vector(0, 0, 0, 1);
-            InitializeWall(position.Clone(),
-                position.CloneMoved(a, 0, 0),
-                position.CloneMoved(a, 0, c),
-                position.CloneMoved(0, 0, c),
+            InitializeWall(position.CloneMoved(0 - a / 2, 0 - b / 2, 0 - c / 2),
+                position.CloneMoved(a - a / 2, 0 - b / 2, 0 - c / 2),
+                position.CloneMoved(a - a / 2, 0 - b / 2, c - c / 2),
+                position.CloneMoved(0 - a / 2, 0 - b / 2, c - c / 2),
                 new Vector(0, -1, 0, 0));
-            InitializeWall(position.CloneMoved(0, b, 0),
-                position.CloneMoved(a, b, 0),
-                position.CloneMoved(a, 0, 0),
-                position.Clone(),
+            InitializeWall(position.CloneMoved(0 - a / 2, b - b / 2, 0 - c / 2),
+                position.CloneMoved(a - a / 2, b - b / 2, 0 - c / 2),
+                position.CloneMoved(a - a / 2, 0 - b / 2, 0 - c / 2),
+                position.CloneMoved(0 - a / 2, 0 - b / 2, 0 - c / 2),
                 new Vector(0, 0, -1, 0));
-            InitializeWall(position.CloneMoved(a, b, 0),
-                position.CloneMoved(a, b, c),
-                position.CloneMoved(a, 0, c),
-                position.CloneMoved(a, 0, 0),
+            InitializeWall(position.CloneMoved(a - a / 2, b - b / 2, 0 - c / 2),
+                position.CloneMoved(a - a / 2, b - b / 2, c - c / 2),
+                position.CloneMoved(a - a / 2, 0 - b / 2, c - c / 2),
+                position.CloneMoved(a - a / 2, 0 - b / 2, 0 - c / 2),
                 new Vector(1, 0, 0, 0));
-            InitializeWall(position.CloneMoved(a, b, c),
-                position.CloneMoved(0, b, c),
-                position.CloneMoved(0, 0, c),
-                position.CloneMoved(a, 0, c),
+            InitializeWall(position.CloneMoved(a - a / 2, b - b / 2, c - c / 2),
+                position.CloneMoved(0 - a / 2, b - b / 2, c - c / 2),
+                position.CloneMoved(0 - a / 2, 0 - b / 2, c - c / 2),
+                position.CloneMoved(a - a / 2, 0 - b / 2, c - c / 2),
                 new Vector(0, 0, 1, 0));
-            InitializeWall(position.CloneMoved(0, b, c),
-                position.CloneMoved(0, b, 0),
-                position.Clone(),
-                position.CloneMoved(0, 0, c),
+            InitializeWall(position.CloneMoved(0 - a / 2, b - b / 2, c - c / 2),
+                position.CloneMoved(0 - a / 2, b - b / 2, 0 - c / 2),
+                position.CloneMoved(0 - a / 2, 0 - b / 2, 0 - c / 2),
+                position.CloneMoved(0 - a / 2, 0 - b / 2, c - c / 2),
                 new Vector(-1, 0, 0, 0));
-            InitializeWall(position.CloneMoved(0, b, 0),
-                position.CloneMoved(a, b, 0),
-                position.CloneMoved(a, b, c),
-                position.CloneMoved(0, b, c),
+            InitializeWall(position.CloneMoved(0 - a / 2, b - b / 2, c - c / 2),
+                position.CloneMoved(a - a / 2, b - b / 2, c - c / 2),
+                position.CloneMoved(a - a / 2, b - b / 2, 0 - c / 2),
+                position.CloneMoved(0 - a / 2, b - b / 2, 0 - c / 2),
                 new Vector(0, 1, 0, 0));
         }
 
@@ -90,6 +90,11 @@ namespace Editor3D.Shapes
         internal void Translate(double x, double y, double z)
         {
             translationMatrix.Translate(x, y, z);
+        }
+
+        internal void Rotate(int degrees, Axis axis)
+        {
+            rotationMatrix.Rotate(degrees * Math.PI / 180, axis);
         }
     }
 }
