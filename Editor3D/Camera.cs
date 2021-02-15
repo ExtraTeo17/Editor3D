@@ -5,24 +5,30 @@ namespace Editor3D
 {
     internal class Camera
     {
-        private Matrix viewMatrix;
-        private Matrix projectionMatrix;
-        private Vector forwardDirection;
-        private Vector position;
+        private Vector cameraPosition;
+        private Vector observedPosition;
+        private double nearPlane;
+        private double farPlane;
+        private double fieldOfView;
+        private double aspect;
+
         private Matrix cameraRotationMatrix = Matrix.Unitary();
 
         internal Camera(Vector cameraPosition, Vector observedPosition, double nearPlane,
             double farPlane, double fieldOfView, double aspect)
         {
-            this.position = cameraPosition;
-            viewMatrix = GenerateViewMatrix(cameraPosition, observedPosition);
-            projectionMatrix = Matrix.Projection(nearPlane, farPlane, fieldOfView, aspect);
+            this.cameraPosition = cameraPosition;
+            this.observedPosition = observedPosition;
+            this.nearPlane = nearPlane;
+            this.farPlane = farPlane;
+            this.fieldOfView = fieldOfView;
+            this.aspect = aspect;
         }
 
-        private Matrix GenerateViewMatrix(Vector cameraPosition, Vector observedPosition)
+        private Matrix GenerateViewMatrix()
         {
             Vector upWorldDirection = new Vector(0, 1, 0, 0);
-            forwardDirection = observedPosition.DirectionTo(cameraPosition).Normalize();
+            Vector forwardDirection = GetForwardDirection();
             Vector rightDirection = upWorldDirection.CrossProduct(forwardDirection).Normalize();
             Vector upDirection = forwardDirection.CrossProduct(rightDirection).Normalize();
             Matrix rotationMatrix = Matrix.Rotation(rightDirection, upDirection, forwardDirection);
@@ -32,22 +38,27 @@ namespace Editor3D
 
         internal Matrix GetViewMatrix()
         {
-            return viewMatrix;
+            return GenerateViewMatrix();
         }
 
         internal Matrix GetProjectionMatrix()
         {
-            return projectionMatrix;
+            return Matrix.Projection(nearPlane, farPlane, fieldOfView, aspect);
         }
 
         internal Vector GetForwardDirection()
         {
-            return forwardDirection;
+            return GetObservedPoint().DirectionTo(cameraPosition).Normalize();
+        }
+
+        private Vector GetObservedPoint()
+        {
+            return cameraRotationMatrix.MultipliedBy(observedPosition);
         }
 
         internal Vector GetPosition()
         {
-            return position;//cameraRotationMatrix.MultipliedBy(position);
+            return cameraPosition;//cameraRotationMatrix.MultipliedBy(position);
         }
 
         internal void Rotate(int degrees, Axis axis)

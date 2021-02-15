@@ -14,7 +14,7 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const bool SHOULD_RENDER_LINES = false;
+        private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 20;
         private const Shading SHADING = Shading.Gourand;
 
@@ -39,10 +39,10 @@ namespace Editor3D
         private void PrepareCameras()
         {
             //Vector cameraPosition = new Vector(600, 500, 900, 1);
-            Vector cameraPosition = new Vector(0, 0, 40, 1);
-            Vector observedPosition = new Vector(0, 0, 0, 1);
+            Vector cameraPosition = new Vector(0, 0, 0, 1);
+            Vector observedPosition = new Vector(0, 0, -40, 1);
             double nearPlane = 1; // 15
-            double farPlane = 100; // 45
+            double farPlane = 300; // 45
             double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,
@@ -52,7 +52,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            lights.Add(new Light(Color.White, Color.White, new Vector(-15, 0, 0, 1)));
+            //lights.Add(new Light(Color.White, Color.White, new Vector(-15, 0, -40, 1)));
         }
 
         private void PrepareBitmap()
@@ -108,9 +108,9 @@ namespace Editor3D
         private void PrepareScene()
         {
             //AddBall(3, Color.Red, 11, 0, 10);
-            AddBall(10, Color.Green, 0, 0, 0);
+            AddBall(10, Color.Green, 0, 0, -40);
             //AddBall(10, Color.Cyan, -20, 0, -20);
-            AddCuboid(2, 2, 2, Color.Pink, -15 - 1, 0 - 1, 0 - 1);
+            AddCuboid(2, 2, 2, Color.Pink, -15 - 1, 0 - 1, -40 - 1);
             //PrepareRoomWalls();
             //AddCuboid(100, 100, 100, Color.Red, 100, 0, 100);
             //PrepareTrack();

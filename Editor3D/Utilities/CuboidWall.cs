@@ -31,5 +31,12 @@ namespace Editor3D.Utilities
             upperTriangle.RenderLines(displayer, info);
             lowerTriangle.RenderLines(displayer, info);
         }
+
+        internal bool CheckRenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
+        {
+            if (!upperTriangle.CheckRenderFilling(displayer, info, color)) return false;
+            if (!lowerTriangle.CheckRenderFilling(displayer, info, color)) return false;
+            return true;
+        }
     }
 }

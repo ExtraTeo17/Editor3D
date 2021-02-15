@@ -17,7 +17,7 @@ namespace Editor3D.Utilities
         private readonly GourandInfo gourandInfo = new GourandInfo();
 
         private bool trace = false;
-        private bool specialTrace = false;
+        private bool shouldBeDisplayed = false;
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {
@@ -35,7 +35,7 @@ namespace Editor3D.Utilities
             this.normalVector = pos2.SubstractedBy(pos1).CrossProduct(pos3.SubstractedBy(pos1));
         }
 
-        internal void RenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
+        internal bool CheckRenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
         {
             v1.MakeModel(info);
             v2.MakeModel(info);
@@ -43,16 +43,27 @@ namespace Editor3D.Utilities
             ApplyNormalVectorRotations();
             if (ShouldBeDisplayed(v1, info))
             {
-                v1.Render(displayer, info);
-                v2.Render(displayer, info);
-                v3.Render(displayer, info);
+                this.shouldBeDisplayed = true;
+                if (!v1.Render(displayer, info)) return false;
+                if (!v2.Render(displayer, info)) return false;
+                if (!v3.Render(displayer, info)) return false;
                 /*if (displayer.GetShading() == Shading.Flat)
                 {
                     color = ComputeColorFlatShading();
                 }
                 else */
-                RenderFillingScanLine(displayer, color, info.GetLights(), info.GetCameraPosition());
             }
+            else
+            {
+                this.shouldBeDisplayed = false;
+            }
+            return true;
+        }
+
+        internal void RenderFilling(IDisplayer displayer, PipelineInfo info, Color color)
+        {
+            if (shouldBeDisplayed)
+                RenderFillingScanLine(displayer, color, info.GetLights(), info.GetCameraPosition());
         }
 
         private void ApplyNormalVectorRotations()

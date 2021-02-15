@@ -23,9 +23,12 @@ namespace Editor3D.Utilities
             normalVector = worldPosition.Clone().Normalize();
         }
 
-        internal void Render(IDisplayer displayer, PipelineInfo info)
+        internal bool Render(IDisplayer displayer, PipelineInfo info)
         {
-            screenPosition = worldPosition.Render(displayer, info);
+            Vector isInCameraView = worldPosition.Render(displayer, info);
+            if (isInCameraView == null) return false;
+            screenPosition = isInCameraView;
+            return true;
         }
 
         public Vector GetScreenPosition()

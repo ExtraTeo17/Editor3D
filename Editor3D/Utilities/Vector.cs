@@ -42,7 +42,8 @@ namespace Editor3D.Utilities
         internal Vector Render(IDisplayer displayer, PipelineInfo info)
         {
             Vector viewVector = info.GetViewMatrix().MultipliedBy(this);
-            Vector clipVector = info.GetProjectionMatrix().MultipliedBy(viewVector);//.DivideByW();
+            Vector clipVector = info.GetProjectionMatrix().MultipliedBy(viewVector);
+            if (!IsInView(clipVector)) return null;
             Vector ndcVector = clipVector.Clone().DivideByW();
             Matrix screenMatrix = Matrix.Screen(info.GetScreenWidth(), info.GetScreenHeight());
             Vector screenVector = screenMatrix.MultipliedBy(ndcVector);
@@ -58,11 +59,18 @@ namespace Editor3D.Utilities
                 Console.WriteLine("screen = " + screenVector);
                 Console.WriteLine();
             }*/
-            if (info.ShouldRenderLines())
+            /*if (info.ShouldRenderLines())
             {
                 displayer.Display((int)screenVector.x, (int)screenVector.y, screenVector.z, Color.Black);
-            }
+            }*/
             return screenVector;
+        }
+
+        private bool IsInView(Vector c)
+        {
+            return c.x >= -c.w && c.x <= c.w &&
+                c.y >= -c.w && c.y <= c.w &&
+                c.z >= -c.w && c.z <= c.w;
         }
 
         private Vector InScreenSpace(double width, double height)

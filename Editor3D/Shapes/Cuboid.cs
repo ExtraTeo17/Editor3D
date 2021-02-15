@@ -72,6 +72,10 @@ namespace Editor3D.Shapes
             info.SetTranslationMatrix(translationMatrix);
             foreach (CuboidWall wall in walls)
             {
+                if (!wall.CheckRenderFilling(displayer, info, color)) return;
+            }
+            foreach (CuboidWall wall in walls)
+            {
                 wall.RenderFilling(displayer, info, color);
             }
             if (info.ShouldRenderLines())
