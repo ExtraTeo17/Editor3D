@@ -9,7 +9,7 @@ namespace Editor3D.Utilities
         private Vector startPosition;
         private Vector worldPosition;
         private Vector screenPosition;
-        private readonly Vector normalVector;
+        private Vector normalVector;
 
         public Vertex(Vector position, Vector normalVector)
         {
@@ -19,7 +19,8 @@ namespace Editor3D.Utilities
 
         internal void MakeModel(PipelineInfo info)
         {
-            worldPosition = startPosition.MakeModel(info);
+            worldPosition = startPosition.Rotate(info).Translate(info);
+            normalVector = worldPosition.Clone().Normalize();
         }
 
         internal void Render(IDisplayer displayer, PipelineInfo info)

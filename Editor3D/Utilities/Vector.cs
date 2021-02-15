@@ -21,11 +21,23 @@ namespace Editor3D.Utilities
             return new Vector(x + a, y + b, z + c, w);
         }
 
-        internal Vector MakeModel(PipelineInfo info)
+        internal Vector Translate(PipelineInfo info)
         {
-            Vector worldVector = info.GetModelMatrix().MultipliedBy(this);
-            return worldVector;
+            Vector translated = info.GetTranslationMatrix().MultipliedBy(this);
+            return translated;
         }
+
+        internal Vector Rotate(PipelineInfo info)
+        {
+            Vector rotated = info.GetRotationMatrix().MultipliedBy(this);
+            return rotated;
+        }
+
+        /*internal Vector MakeModelCleanRotation(PipelineInfo info)
+        {
+            Vector rotated = info.GetModelMatrix().CleanRotation().MultipliedBy(this);
+            return rotated;
+        }*/
 
         internal Vector Render(IDisplayer displayer, PipelineInfo info)
         {

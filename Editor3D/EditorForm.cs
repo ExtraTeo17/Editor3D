@@ -15,7 +15,7 @@ namespace Editor3D
     public partial class EditorForm : Form, IDisplayer
     {
         private const bool SHOULD_RENDER_LINES = true;
-        private const int FRAMES_PER_SECOND = 3;
+        private const int FRAMES_PER_SECOND = 20;
         private const Shading SHADING = Shading.Flat;
 
         private Bitmap bitmap;
@@ -40,11 +40,12 @@ namespace Editor3D
 
         private void PrepareCameras()
         {
-            Vector cameraPosition = new Vector(280, 180, 280, 1);
+            //Vector cameraPosition = new Vector(600, 500, 900, 1);
+            Vector cameraPosition = new Vector(0, 0, 40, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
             double nearPlane = 20; // 15
-            double farPlane = 600; // 45
-            double fieldOfView = Math.PI * 40 / 180;
+            double farPlane = 2000; // 45
+            double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,
                 nearPlane, farPlane, fieldOfView, aspect));
@@ -81,7 +82,10 @@ namespace Editor3D
 
         private void UpdateScene(object sender, EventArgs e)
         {
-            balls[0].Translate(0, 1, 0);
+            //balls[0].Translate(0, 1, 0);
+            //balls[0].Rotate(1, Axis.X);
+            balls[0].Rotate(1, Axis.Y);
+            //balls[0].Rotate(1, Axis.Z);
             //balls[1].Translate(-0.1, 0, 0);
             //cuboids[0].Translate(0, 1, 0);
             RenderGraphics();
@@ -105,11 +109,20 @@ namespace Editor3D
         private void PrepareScene()
         {
             //AddBall(3, Color.Red, 11, 0, 10);
-            AddBall(20, Color.Green, 40, 20, 40);
+            AddBall(10, Color.Green, -10, 0, 0);
             //AddBall(10, Color.Cyan, -20, 0, -20);
             //AddCuboid(12, 3, 24, Color.Pink, 0, 0, 0);
-            PrepareRoomWalls();
+            //PrepareRoomWalls();
             //AddCuboid(100, 100, 100, Color.Red, 100, 0, 100);
+            //PrepareTrack();
+        }
+
+        private void PrepareTrack()
+        {
+            Color trackColor = Color.Blue;
+            AddCuboid(100, 10, 300, trackColor, -50, 0, -150);
+            AddCuboid(100, 10, 300, trackColor, -50, 0, 150);
+            AddCuboid(300, 10, 100, trackColor, 120.71068, 0, 520.71068);
         }
 
         private void PrepareRoomWalls()

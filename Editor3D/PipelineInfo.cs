@@ -6,7 +6,8 @@ namespace Editor3D
 {
     internal class PipelineInfo
     {
-        private Matrix modelMatrix;
+        private Matrix rotationMatrix;
+        private Matrix translationMatrix;
         private readonly Matrix viewMatrix;
         private readonly Matrix projectionMatrix;
         private readonly int screenWidth;
@@ -30,9 +31,14 @@ namespace Editor3D
             this.cameraPosition = cameraPosition;
         }
 
-        internal Matrix GetModelMatrix()
+        internal Matrix GetRotationMatrix()
         {
-            return modelMatrix;
+            return rotationMatrix;
+        }
+
+        internal Matrix GetTranslationMatrix()
+        {
+            return translationMatrix;
         }
 
         internal Matrix GetViewMatrix()
@@ -70,9 +76,14 @@ namespace Editor3D
             return lights;
         }
 
-        internal void SetModelMatrix(Matrix modelMatrix)
+        internal void SetRotationMatrix(Matrix matrix)
         {
-            this.modelMatrix = modelMatrix;
+            this.rotationMatrix = matrix;
+        }
+
+        internal void SetTranslationMatrix(Matrix matrix)
+        {
+            this.translationMatrix = matrix;
         }
 
         internal bool ShouldRenderLines()

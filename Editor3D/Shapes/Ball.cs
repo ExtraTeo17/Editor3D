@@ -10,8 +10,9 @@ namespace Editor3D.Shapes
     {
         private double radius;
         private List<CuboidWall> walls = new List<CuboidWall>();
-        private List<Triangle> tops = new List<Triangle>(); // FILL CZUBKI TODO
-        private Matrix modelMatrix;
+        private List<Triangle> tops = new List<Triangle>();
+        private Matrix rotationMatrix;
+        private Matrix translationMatrix;
         private readonly Color color;
 
         public Ball(double radius, int latitudeDivisions, int longitudeDivisions,
@@ -19,7 +20,8 @@ namespace Editor3D.Shapes
         {
             this.radius = radius;
             this.color = color;
-            modelMatrix = Matrix.Unitary();
+            translationMatrix = Matrix.Unitary();
+            rotationMatrix = Matrix.Unitary();
             InitializeMesh(latitudeDivisions, longitudeDivisions);
         }
 
@@ -87,9 +89,14 @@ namespace Editor3D.Shapes
             InitializeTriangle(pos1, pos2, pos3);
         }
 
+        internal void Rotate(double degrees, Axis axis)
+        {
+            rotationMatrix.Rotate(degrees * Math.PI / 180, axis);
+        }
+
         internal void Translate(double x, double y, double z)
         {
-            modelMatrix.Translate(x, y, z);
+            translationMatrix.Translate(x, y, z);
         }
 
         private void InitializeTriangle(Vector pos1, Vector pos2, Vector pos3)
@@ -131,7 +138,8 @@ namespace Editor3D.Shapes
 
         internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            info.SetModelMatrix(modelMatrix);
+            info.SetRotationMatrix(rotationMatrix);
+            info.SetTranslationMatrix(translationMatrix);
             foreach (CuboidWall wall in walls)
             {
                 wall.RenderFilling(displayer, info, color);

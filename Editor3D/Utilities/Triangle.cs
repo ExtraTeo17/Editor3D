@@ -13,7 +13,7 @@ namespace Editor3D.Utilities
         private Color Ia = Color.White;
 
         private readonly Vertex v1, v2, v3;
-        private readonly Vector normalVector;
+        private Vector normalVector;
         private readonly GourandInfo gourandInfo = new GourandInfo();
 
         private bool trace = false;
@@ -40,6 +40,7 @@ namespace Editor3D.Utilities
             v1.MakeModel(info);
             v2.MakeModel(info);
             v3.MakeModel(info);
+            ApplyNormalVectorRotations();
             if (ShouldBeDisplayed(v1, info))
             {
                 v1.Render(displayer, info);
@@ -54,9 +55,15 @@ namespace Editor3D.Utilities
             }
         }
 
+        private void ApplyNormalVectorRotations()
+        {
+            this.normalVector = v2.GetWorldPosition().SubstractedBy(v1.GetWorldPosition())
+                .CrossProduct(v3.GetWorldPosition().SubstractedBy(v1.GetWorldPosition()));
+        }
+
         private bool ShouldBeDisplayed(Vertex vertex, PipelineInfo info)
         {
-            return v1.GetWorldPosition().DirectionTo(info.GetCameraPosition()).DotProduct(normalVector) > 0;
+            return vertex.GetWorldPosition().DirectionTo(info.GetCameraPosition()).DotProduct(normalVector) > 0;
         }
 
         private void PrepareGourandVertexIntensities(Color color, List<Light> lights, Vector cameraPos, List<Vertex> vertices)
@@ -113,7 +120,7 @@ namespace Editor3D.Utilities
                 Console.WriteLine(v1.GetScreenPosition() + ", " + v2.GetScreenPosition() + ", " + v3.GetScreenPosition());
                 color = Color.White;
                 Console.WriteLine(vertices[0].GetScreenPosition());
-                trace = true;
+                trace = false; // TRACETRUE
             }
 
             if (displayer.GetShading() == Shading.Gourand)
@@ -210,7 +217,7 @@ namespace Editor3D.Utilities
                         v3.GetColor(), v1.GetColor());
                 }
                 if (scanline == v2.y - 1)
-                    specialTrace = true;
+                    specialTrace = false; // TRACETRUE
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
                     InterpolateZ(v2.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
                     InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),

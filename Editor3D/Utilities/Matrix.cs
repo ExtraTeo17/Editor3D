@@ -95,6 +95,41 @@ namespace Editor3D.Utilities
             return multiplied;
         }
 
+        internal void Rotate(double radians, Axis axis)
+        {
+            matrix = Matrix.Rotation(radians, axis).MultipliedBy(this).matrix;
+        }
+
+        private static Matrix Rotation(double radians, Axis axis)
+        {
+            Matrix matrix = Matrix.Unitary();
+            double minusSin = -Math.Sin(radians);
+            double sin = Math.Sin(radians);
+            double cos = Math.Cos(radians);
+            switch (axis)
+            {
+                case Axis.X:
+                    matrix.matrix[1, 1] = cos;
+                    matrix.matrix[2, 1] = minusSin;
+                    matrix.matrix[1, 2] = sin;
+                    matrix.matrix[2, 2] = cos;
+                    break;
+                case Axis.Y:
+                    matrix.matrix[0, 0] = cos;
+                    matrix.matrix[2, 0] = minusSin;
+                    matrix.matrix[0, 2] = sin;
+                    matrix.matrix[2, 2] = cos;
+                    break;
+                case Axis.Z:
+                    matrix.matrix[0, 0] = cos;
+                    matrix.matrix[1, 0] = minusSin;
+                    matrix.matrix[0, 1] = sin;
+                    matrix.matrix[1, 1] = cos;
+                    break;
+            }
+            return matrix;
+        }
+
         internal Vector MultipliedBy(Vector vector)
         {
             double x = (matrix[0, 0] * vector.x) + (matrix[1, 0] * vector.y) + (matrix[2, 0] * vector.z) + (matrix[3, 0] * vector.w);

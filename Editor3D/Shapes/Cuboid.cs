@@ -10,7 +10,8 @@ namespace Editor3D.Shapes
     {
         private double a, b, c;
         private List<CuboidWall> walls = new List<CuboidWall>();
-        private Matrix modelMatrix;
+        private Matrix rotationMatrix;
+        private Matrix translationMatrix;
         private readonly Color color;
 
         public Cuboid(double a, double b, double c, Color color)
@@ -19,7 +20,8 @@ namespace Editor3D.Shapes
             this.b = b;
             this.c = c;
             this.color = color;
-            modelMatrix = Matrix.Unitary();
+            translationMatrix = Matrix.Unitary();
+            rotationMatrix = Matrix.Unitary();
             InitializeMesh();
         }
 
@@ -66,7 +68,8 @@ namespace Editor3D.Shapes
 
         internal void Render(IDisplayer displayer, PipelineInfo info)
         {
-            info.SetModelMatrix(modelMatrix);
+            info.SetRotationMatrix(rotationMatrix);
+            info.SetTranslationMatrix(translationMatrix);
             foreach (CuboidWall wall in walls)
             {
                 wall.RenderFilling(displayer, info, color);
@@ -82,7 +85,7 @@ namespace Editor3D.Shapes
 
         internal void Translate(double x, double y, double z)
         {
-            modelMatrix.Translate(x, y, z);
+            translationMatrix.Translate(x, y, z);
         }
     }
 }
