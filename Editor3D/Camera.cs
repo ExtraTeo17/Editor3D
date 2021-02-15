@@ -9,6 +9,7 @@ namespace Editor3D
         private Matrix projectionMatrix;
         private Vector forwardDirection;
         private Vector position;
+        private Matrix cameraRotationMatrix = Matrix.Unitary();
 
         internal Camera(Vector cameraPosition, Vector observedPosition, double nearPlane,
             double farPlane, double fieldOfView, double aspect)
@@ -46,7 +47,12 @@ namespace Editor3D
 
         internal Vector GetPosition()
         {
-            return position;
+            return position;//cameraRotationMatrix.MultipliedBy(position);
+        }
+
+        internal void Rotate(int degrees, Axis axis)
+        {
+            cameraRotationMatrix.Rotate(degrees * Math.PI / 180, axis);
         }
     }
 }

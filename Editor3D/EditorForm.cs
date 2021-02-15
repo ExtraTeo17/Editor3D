@@ -25,14 +25,12 @@ namespace Editor3D
         private double[,] zBuffor;
         private List<Cuboid> cuboids = new List<Cuboid>();
         private List<Ball> balls = new List<Ball>();
-        private PipelineInfo info;
 
         public EditorForm()
         {
             InitializeComponent();
             PrepareCameras();
             PrepareLights();
-            GeneratePipelineInfo();
             PrepareScene();
             //RenderGraphics();
             UpdateScenePeriodically();
@@ -43,8 +41,8 @@ namespace Editor3D
             //Vector cameraPosition = new Vector(600, 500, 900, 1);
             Vector cameraPosition = new Vector(0, 0, 40, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
-            double nearPlane = 20; // 15
-            double farPlane = 2000; // 45
+            double nearPlane = 1; // 15
+            double farPlane = 100; // 45
             double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,
@@ -54,7 +52,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            lights.Add(new Light(Color.White, Color.White, new Vector(-30, 0, 20, 1)));
+            lights.Add(new Light(Color.White, Color.White, new Vector(-15, 0, 0, 1)));
         }
 
         private void PrepareBitmap()
@@ -68,7 +66,7 @@ namespace Editor3D
             zBuffor = new double[pictureBox1.Width, pictureBox1.Height];
             for (int i = 0; i < pictureBox1.Width; ++i)
                 for (int j = 0; j < pictureBox1.Height; ++j)
-                    zBuffor[i, j] = 0;
+                    zBuffor[i, j] = 1;
         }
 
         private void UpdateScenePeriodically()
@@ -88,6 +86,7 @@ namespace Editor3D
             //balls[0].Rotate(1, Axis.Z);
             //balls[1].Translate(-0.1, 0, 0);
             //cuboids[0].Translate(0, 1, 0);
+            cameras[0].Rotate(1, Axis.Y);
             RenderGraphics();
         }
 
@@ -96,11 +95,11 @@ namespace Editor3D
             PrepareBitmap();
             foreach (Ball ball in balls)
             {
-                ball.Render(this, info);
+                ball.Render(this, GeneratePipelineInfo());
             }
             foreach (Cuboid cuboid in cuboids)
             {
-                cuboid.Render(this, info);
+                cuboid.Render(this, GeneratePipelineInfo());
             }
             // TODO: Add other objects
             pictureBox1.Refresh();
@@ -109,9 +108,9 @@ namespace Editor3D
         private void PrepareScene()
         {
             //AddBall(3, Color.Red, 11, 0, 10);
-            AddBall(10, Color.Green, -10, 0, 0);
+            AddBall(10, Color.Green, 0, 0, 0);
             //AddBall(10, Color.Cyan, -20, 0, -20);
-            AddCuboid(2, 2, 2, Color.Pink, -10, 0, 10);
+            AddCuboid(2, 2, 2, Color.Pink, -15 - 1, 0 - 1, 0 - 1);
             //PrepareRoomWalls();
             //AddCuboid(100, 100, 100, Color.Red, 100, 0, 100);
             //PrepareTrack();
@@ -149,10 +148,10 @@ namespace Editor3D
             cuboids.Add(cuboid);
         }
 
-        private void GeneratePipelineInfo()
+        private PipelineInfo GeneratePipelineInfo()
         {
             Camera currentCamera = cameras[currentCameraIndex];
-            info = new PipelineInfo(currentCamera.GetViewMatrix(),
+            return new PipelineInfo(currentCamera.GetViewMatrix(),
                 currentCamera.GetProjectionMatrix(), pictureBox1.Width, pictureBox1.Height,
                 currentCamera.GetForwardDirection(), SHOULD_RENDER_LINES, lights,
                 currentCamera.GetPosition());
@@ -162,7 +161,7 @@ namespace Editor3D
         {
             if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
             {
-                if (z >= zBuffor[x, y] + 0.01)
+                if (z <= zBuffor[x, y])
                 {
                     bitmap.SetPixel(x, y, color);
                     zBuffor[x, y] = z;

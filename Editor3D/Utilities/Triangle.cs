@@ -72,10 +72,6 @@ namespace Editor3D.Utilities
             {
                 vertex.GetScreenPosition().SetColor(ComputeColorPhongModel(color, lights, vertex.GetWorldPosition(), cameraPos, vertex.GetNormalVector()));
             }
-            if (DebugTriangle())
-            {
-                Console.WriteLine("V1 " + v1.GetScreenPosition().GetColor() + ", V2 " + v2.GetScreenPosition().GetColor() + ", V3 " + v3.GetScreenPosition().GetColor());
-            }
         }
 
         private bool DebugTriangle()
@@ -110,126 +106,110 @@ namespace Editor3D.Utilities
         {
             List<Vertex> vertices = new List<Vertex>() { v1, v2, v3 };
             vertices.Sort(CompareByY);
-            List<Vector> positions = new List<Vector>() { vertices[0].GetScreenPosition(),
-                vertices[1].GetScreenPosition(), vertices[2].GetScreenPosition() };
+            int x0 = (int)vertices[0].GetScreenPosition().x;
+            int y0 = (int)vertices[0].GetScreenPosition().y;
+            int x1 = (int)vertices[1].GetScreenPosition().x;
+            int y1 = (int)vertices[1].GetScreenPosition().y;
+            int x2 = (int)vertices[2].GetScreenPosition().x;
+            int y2 = (int)vertices[2].GetScreenPosition().y;
+            double z0 = vertices[0].GetScreenPosition().z;
+            double z1 = vertices[1].GetScreenPosition().z;
+            double z2 = vertices[2].GetScreenPosition().z;
 
-
-            if (v1.GetScreenPosition().x > 227 && v1.GetScreenPosition().x < 228 && v1.GetScreenPosition().y > 209 && v1.GetScreenPosition().y < 211
+            /*if (v1.GetScreenPosition().x > 227 && v1.GetScreenPosition().x < 228 && v1.GetScreenPosition().y > 209 && v1.GetScreenPosition().y < 211
                 && v2.GetScreenPosition().x > 227)
             {
                 Console.WriteLine(v1.GetScreenPosition() + ", " + v2.GetScreenPosition() + ", " + v3.GetScreenPosition());
                 color = Color.White;
                 Console.WriteLine(vertices[0].GetScreenPosition());
                 trace = false; // TRACETRUE
-            }
+            }*/
 
             if (displayer.GetShading() == Shading.Gourand)
             {
                 PrepareGourandVertexIntensities(color, lights, cameraPos, vertices);
             }
-            if (positions[1].y == positions[2].y)
+            Color c0 = vertices[0].GetScreenPosition().GetColor();
+            Color c1 = vertices[1].GetScreenPosition().GetColor();
+            Color c2 = vertices[2].GetScreenPosition().GetColor();
+            if (y1 == y2)
             {
-                FillBottomTriangle(displayer, positions[0], positions[1], positions[2], color, lights);
+                FillBottomTriangle(displayer, x0, y0, z0, c0, x1, y1, z1, c1, x2, y2, z2, c2, color, lights);
             }
-            else if (positions[0].y == positions[1].y)
+            else if (y0 == y1)
             {
-                FillTopTriangle(displayer, positions[0], positions[1], positions[2], color, lights);
+                FillTopTriangle(displayer, x0, y0, z0, c0, x1, y1, z1, c1, x2, y2, z2, c2, color, lights);
             }
             else
             {
-                double v4x = positions[0].x + ((positions[1].y - positions[0].y) / (positions[2].y - positions[0].y)) * (positions[2].x - positions[0].x);
-                double v4z = InterpolateZ(positions[0].z, positions[2].z, Math.Abs((positions[1].y - positions[0].y) / (positions[2].y - positions[0].y)));
-                Vector v4 = new Vector(v4x, positions[1].y, v4z, 1);
+                int x3 = x0 + (int)(((double)(y1 - y0) / (double)(y2 - y0)) * (x2 - x0));
+                int y3 = y1;
+                double z3 = InterpolateZ(z0, z2, (double)(y1 - y0) / (double)(y2 - y0));
+                Color c3 = new Color();
                 if (displayer.GetShading() == Shading.Gourand)
                 {
-                    v4.SetColor(InterpolateColorGourandShading(positions[2].y, positions[0].y, (int)positions[1].y,
-                        positions[2].GetColor(), positions[0].GetColor()));
+                    c3 = InterpolateColorGourandShading(y2, y0, y1, c2, c0);
                 }
-                FillBottomTriangle(displayer, positions[0], positions[1], v4, color, lights);
-                FillTopTriangle(displayer, positions[1], v4, positions[2], color, lights);
+                FillBottomTriangle(displayer, x0, y0, z0, c0, x1, y1, z1, c1, x3, y3, z3, c3, color, lights);
+                FillTopTriangle(displayer, x1, y1, z1, c1, x3, y3, z3, c3, x2, y2, z2, c2, color, lights);
             }
 
             //trace = false;
         }
 
-        private void FillTopTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
+        private void FillTopTriangle(IDisplayer displayer,
+            int x0, int y0, double z0, Color c0,
+            int x1, int y1, double z1, Color c1,
+            int x2, int y2, double z2, Color c2,
             Color color, List<Light> lights)
         {
-            /*if (trace)
-            {
-                Console.WriteLine("BEFORE FILLING INTRO: " + v1 + ", " + v2 + ", " + v3);
-                Console.WriteLine("FILL FROM: (" + v1.x + ", " + v1.y + ") TO (" + v3.x + ", " + v3.y + ")");
-                Console.WriteLine("START V1.z: " + v1.z + ", V3.z: " + v3.z);
-            }*/
-
-            double d1 = (v3.x - v1.x) / Math.Ceiling(v3.y - v1.y);
-            double d2 = (v3.x - v2.x) / Math.Ceiling(v3.y - v2.y);
-            double x1 = v3.x;
-            double x2 = v3.x;
-            for (int scanline = (int)v3.y; scanline >= v1.y; --scanline)
+            double d1 = (double)(x2 - x0) / (double)(y2 - y0 + 1);
+            double d2 = (double)(x2 - x1) / (double)(y2 - y1 + 1);
+            double xa = x2;
+            double xb = x2;
+            for (int sc = y2; sc >= y0; --sc)
             {
                 Color leftInsensity = new Color();
                 Color rightIntensity = new Color();
                 if (displayer.GetShading() == Shading.Gourand)
                 {
-                    leftInsensity = InterpolateColorGourandShading(v3.y, v1.y, scanline,
-                        v3.GetColor(), v1.GetColor());
-                    rightIntensity = InterpolateColorGourandShading(v3.y, v2.y, scanline,
-                        v3.GetColor(), v2.GetColor());
+                    leftInsensity = InterpolateColorGourandShading(y2, y0, sc, c2, c0);
+                    rightIntensity = InterpolateColorGourandShading(y2, y1, sc, c2, c1);
                 }
-                RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
-                    InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)),
-                    InterpolateZ(v3.z, v2.z, (double)(scanline - (int)v1.y) / (double)((int)v3.y - (int)v1.y)),
+                xa -= d1;
+                xb -= d2;
+                RenderHorizontalLine(displayer, (int)xa, (int)xb, sc,
+                    InterpolateZ(z0, z2, (double)(sc - y0) / (double)(y2 - y0)),
+                    InterpolateZ(z1, z2, (double)(sc - y0) / (double)(y2 - y0)),
                     color, lights, leftInsensity, rightIntensity);
-                x1 -= d1;
-                x2 -= d2;
             }
-
-            /*if (trace)
-            {
-                Console.WriteLine("FINISH");
-            }*/
         }
 
-        private void FillBottomTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
+        private void FillBottomTriangle(IDisplayer displayer,
+            int x0, int y0, double z0, Color c0,
+            int x1, int y1, double z1, Color c1,
+            int x2, int y2, double z2, Color c2,
             Color color, List<Light> lights)
         {
-            if (trace)
-            {
-                Console.WriteLine("BEFORE FILLING INTRO: " + v1 + ", " + v2 + ", " + v3);
-                Console.WriteLine("FILL FROM: (" + v3.x + ", " + v3.y + ") TO (" + v2.x + ", " + v2.y + ")");
-                Console.WriteLine("START V3.z: " + v3.z + ", V2.z: " + v2.z);
-            }
-
-            double d1 = (v2.x - v1.x) / Math.Ceiling(v2.y - v1.y);
-            double d2 = (v3.x - v1.x) / Math.Ceiling(v3.y - v1.y);
-            double x1 = v1.x;
-            double x2 = v1.x;
-            for (int scanline = (int)v1.y; scanline <= v2.y; ++scanline)
+            double d1 = (double)(x1 - x0) / (double)(y1 - y0 + 1);
+            double d2 = (double)(x2 - x0) / (double)(y2 - y0 + 1);
+            double xa = x0;
+            double xb = x0;
+            for (int sc = y0; sc <= y1; ++sc)
             {
                 Color leftInsensity = new Color();
                 Color rightIntensity = new Color();
                 if (displayer.GetShading() == Shading.Gourand)
                 {
-                    leftInsensity = InterpolateColorGourandShading(v2.y, v1.y, scanline,
-                        v2.GetColor(), v1.GetColor());
-                    rightIntensity = InterpolateColorGourandShading(v3.y, v1.y, scanline,
-                        v3.GetColor(), v1.GetColor());
+                    leftInsensity = InterpolateColorGourandShading(y1, y0, sc, c1, c0);
+                    rightIntensity = InterpolateColorGourandShading(y2, y0, sc, c2, c0);
                 }
-                if (scanline == v2.y - 1)
-                    specialTrace = false; // TRACETRUE
-                RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
-                    InterpolateZ(v2.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
-                    InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
+                xa += d1;
+                xb += d2;
+                RenderHorizontalLine(displayer, (int)xa, (int)xb, sc,
+                    InterpolateZ(z0, z1, (double)(sc - y0) / (double)(y1 - y0)),
+                    InterpolateZ(z0, z2, (double)(sc - y0) / (double)(y1 - y0)),
                     color, lights, leftInsensity, rightIntensity);
-                specialTrace = false;
-                x1 += d1;
-                x2 += d2;
-            }
-
-            if (trace)
-            {
-                Console.WriteLine("FINISH");
             }
         }
 
@@ -240,18 +220,18 @@ namespace Editor3D.Utilities
             return color;
         }
 
-        private void RenderHorizontalLine(IDisplayer displayer, int x1, int x2, int y, double z0, double z1,
+        private void RenderHorizontalLine(IDisplayer displayer, int x1, int x2, int y, double z1, double z2,
             Color color, List<Light> lights, Color gourandIntensity1, Color gourandIntensity2)
         {
-            double tmpZ = 0;
+            double z = 0;
             if (x1 > x2)
             {
                 int tmp = x1;
                 x1 = x2;
                 x2 = tmp;
-                double tmp2 = z0;
-                z0 = z1;
-                z1 = tmp2;
+                double tmp2 = z1;
+                z1 = z2;
+                z2 = tmp2;
                 Color tmp3 = gourandIntensity1;
                 gourandIntensity1 = gourandIntensity2;
                 gourandIntensity2 = tmp3;
@@ -262,16 +242,10 @@ namespace Editor3D.Utilities
                 {
                     color = InterpolateColorGourandShading(x2, x1, x, gourandIntensity2, gourandIntensity1);
                 }
-                /*else if (displayer.GetShading() == Shading.Phong)
-                {
-                    color = ComputeColorPhongShading();
-                }*/
-                tmpZ = InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1));
-                if (specialTrace)
-                    Console.WriteLine("Z = " + tmpZ);
-                //if (double.IsNaN(tmpZ))
-                //    return;
-                displayer.Display(x, y, tmpZ, color); // TODO: consider changing to primitive types instead of passing Vector
+                // PHONG SHADING CASE
+                double q = x2 == x1 ? 0 : (x - x1) / (x2 - x1);
+                z = InterpolateZ(z1, z2, q);
+                displayer.Display(x, y, z, color); // TODO: consider changing to primitive types instead of passing Vector
             }
         }
 
@@ -355,17 +329,9 @@ namespace Editor3D.Utilities
             int incrDiag = 2 * (dy - dx);
             int y = y0;
 
-            if (trace)
-            {
-                Console.WriteLine("LINE HIGH FROM (" + x0 + ", " + y0 + ") TO (" + x1 + ", " + y1 + ")");
-                Console.WriteLine("START V1.z: " + z0 + ", V3.z: " + z1);
-            }
-
             for (int x = x0; x < x1; ++x)
             {
                 double tmpZ = InterpolateZ(z0, z1, (double)(x - x0) / (double)(x1 - x0));
-                if (trace)
-                    Console.WriteLine("Z = " + tmpZ);
                 displayer.Display(x, y, tmpZ, Color.Black);
                 if (d > 0)
                 {
@@ -377,9 +343,6 @@ namespace Editor3D.Utilities
                     d += incrV;
                 }
             }
-
-            if (trace)
-                Console.WriteLine("END");
         }
 
         private double InterpolateZ(double z0, double z1, double q)
