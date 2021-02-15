@@ -15,7 +15,7 @@ namespace Editor3D
     public partial class EditorForm : Form, IDisplayer
     {
         private const bool SHOULD_RENDER_LINES = true;
-        private const int FRAMES_PER_SECOND = 25;
+        private const int FRAMES_PER_SECOND = 3;
         private const Shading SHADING = Shading.Flat;
 
         private Bitmap bitmap;
@@ -34,16 +34,16 @@ namespace Editor3D
             PrepareLights();
             GeneratePipelineInfo();
             PrepareScene();
-            RenderGraphics();
-            //UpdateScenePeriodically();
+            //RenderGraphics();
+            UpdateScenePeriodically();
         }
 
         private void PrepareCameras()
         {
-            Vector cameraPosition = new Vector(0, 0, 40, 1);
+            Vector cameraPosition = new Vector(280, 180, 280, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
             double nearPlane = 20; // 15
-            double farPlane = 80; // 45
+            double farPlane = 600; // 45
             double fieldOfView = Math.PI * 40 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,
@@ -67,7 +67,7 @@ namespace Editor3D
             zBuffor = new double[pictureBox1.Width, pictureBox1.Height];
             for (int i = 0; i < pictureBox1.Width; ++i)
                 for (int j = 0; j < pictureBox1.Height; ++j)
-                    zBuffor[i, j] = 1;
+                    zBuffor[i, j] = 0;
         }
 
         private void UpdateScenePeriodically()
@@ -81,7 +81,7 @@ namespace Editor3D
 
         private void UpdateScene(object sender, EventArgs e)
         {
-            //balls[0].Translate(0.1, 0, 0);
+            balls[0].Translate(0, 1, 0);
             //balls[1].Translate(-0.1, 0, 0);
             //cuboids[0].Translate(0, 1, 0);
             RenderGraphics();
@@ -105,18 +105,18 @@ namespace Editor3D
         private void PrepareScene()
         {
             //AddBall(3, Color.Red, 11, 0, 10);
-            //AddBall(5, Color.Red, -15, 0, -5);
-            AddBall(10, Color.Cyan, -20, 0, -20);
+            AddBall(20, Color.Green, 40, 20, 40);
+            //AddBall(10, Color.Cyan, -20, 0, -20);
             //AddCuboid(12, 3, 24, Color.Pink, 0, 0, 0);
-            //PrepareRoomWalls();
+            PrepareRoomWalls();
             //AddCuboid(100, 100, 100, Color.Red, 100, 0, 100);
         }
 
         private void PrepareRoomWalls()
         {
-            //AddCuboid(1, 200, 300, Color.Cyan, -1, 0, 0);
-            //AddCuboid(300, 200, 1, Color.Cyan, 0, 0, -1);
-            AddCuboid(250, 1, 250, Color.Brown, 0, -1, 0);
+            AddCuboid(1, 200, 300, Color.Cyan, -1, 0, 0);
+            AddCuboid(300, 200, 1, Color.Cyan, 0, 0, -1);
+            AddCuboid(300, 1, 300, Color.Brown, 0, -1, 0);
             //AddCuboid(300, 1, 300, Color.Gray, 0, 200, 0);
         }
 
@@ -149,7 +149,7 @@ namespace Editor3D
         {
             if (x >= 0 && x < bitmap.Width && y >= 0 && y < bitmap.Height)
             {
-                if (z <= zBuffor[x, y] + 0.01)
+                if (z >= zBuffor[x, y] + 0.01)
                 {
                     bitmap.SetPixel(x, y, color);
                     zBuffor[x, y] = z;
