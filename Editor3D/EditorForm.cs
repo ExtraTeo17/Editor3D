@@ -14,9 +14,9 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
-        private const bool SHOULD_RENDER_LINES = true;
+        private const bool SHOULD_RENDER_LINES = false;
         private const int FRAMES_PER_SECOND = 20;
-        private const Shading SHADING = Shading.Flat;
+        private const Shading SHADING = Shading.Gourand;
 
         private Bitmap bitmap;
         private List<Camera> cameras = new List<Camera>();
@@ -54,7 +54,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            //lights.Add(new Light(Color.White, Color.White, new Vector(20, 20, 20, 1)));
+            lights.Add(new Light(Color.White, Color.White, new Vector(-30, 0, 20, 1)));
         }
 
         private void PrepareBitmap()
@@ -111,7 +111,7 @@ namespace Editor3D
             //AddBall(3, Color.Red, 11, 0, 10);
             AddBall(10, Color.Green, -10, 0, 0);
             //AddBall(10, Color.Cyan, -20, 0, -20);
-            //AddCuboid(12, 3, 24, Color.Pink, 0, 0, 0);
+            AddCuboid(2, 2, 2, Color.Pink, -10, 0, 10);
             //PrepareRoomWalls();
             //AddCuboid(100, 100, 100, Color.Red, 100, 0, 100);
             //PrepareTrack();

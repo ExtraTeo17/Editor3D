@@ -164,9 +164,9 @@ namespace Editor3D.Utilities
 
             double d1 = (v3.x - v1.x) / Math.Ceiling(v3.y - v1.y);
             double d2 = (v3.x - v2.x) / Math.Ceiling(v3.y - v2.y);
-            double x1 = v3.x + 1;
-            double x2 = v3.x + 1;
-            for (int scanline = (int)v3.y; scanline > v1.y; --scanline)
+            double x1 = v3.x;
+            double x2 = v3.x;
+            for (int scanline = (int)v3.y; scanline >= v1.y; --scanline)
             {
                 Color leftInsensity = new Color();
                 Color rightIntensity = new Color();
@@ -203,9 +203,9 @@ namespace Editor3D.Utilities
 
             double d1 = (v2.x - v1.x) / Math.Ceiling(v2.y - v1.y);
             double d2 = (v3.x - v1.x) / Math.Ceiling(v3.y - v1.y);
-            double x1 = v1.x + 1;
-            double x2 = v1.x + 1;
-            for (int scanline = (int)v1.y; scanline < v2.y; ++scanline)
+            double x1 = v1.x;
+            double x2 = v1.x;
+            for (int scanline = (int)v1.y; scanline <= v2.y; ++scanline)
             {
                 Color leftInsensity = new Color();
                 Color rightIntensity = new Color();
@@ -269,8 +269,8 @@ namespace Editor3D.Utilities
                 tmpZ = InterpolateZ(z0, z1, (double)(x - x1) / (double)(x2 - x1));
                 if (specialTrace)
                     Console.WriteLine("Z = " + tmpZ);
-                if (double.IsNaN(tmpZ))
-                    return;
+                //if (double.IsNaN(tmpZ))
+                //    return;
                 displayer.Display(x, y, tmpZ, color); // TODO: consider changing to primitive types instead of passing Vector
             }
         }
