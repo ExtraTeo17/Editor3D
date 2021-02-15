@@ -53,7 +53,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(609, 426);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1318, 426);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // pictureBox1
@@ -63,7 +63,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox1.Location = new System.Drawing.Point(3, 3);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(420, 420);
+            this.pictureBox1.Size = new System.Drawing.Size(916, 420);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
@@ -76,11 +76,11 @@
             this.tabControl1.Controls.Add(this.lightsPage);
             this.tabControl1.Controls.Add(this.shadingPage);
             this.tabControl1.Controls.Add(this.camerasPage);
-            this.tabControl1.Location = new System.Drawing.Point(429, 3);
+            this.tabControl1.Location = new System.Drawing.Point(925, 3);
             this.tabControl1.Multiline = true;
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(177, 420);
+            this.tabControl1.Size = new System.Drawing.Size(390, 420);
             this.tabControl1.TabIndex = 1;
             // 
             // lightsPage
@@ -88,7 +88,7 @@
             this.lightsPage.Location = new System.Drawing.Point(4, 24);
             this.lightsPage.Name = "lightsPage";
             this.lightsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.lightsPage.Size = new System.Drawing.Size(169, 392);
+            this.lightsPage.Size = new System.Drawing.Size(382, 392);
             this.lightsPage.TabIndex = 0;
             this.lightsPage.Text = "Lights";
             this.lightsPage.UseVisualStyleBackColor = true;
@@ -98,7 +98,7 @@
             this.shadingPage.Location = new System.Drawing.Point(4, 24);
             this.shadingPage.Name = "shadingPage";
             this.shadingPage.Padding = new System.Windows.Forms.Padding(3);
-            this.shadingPage.Size = new System.Drawing.Size(219, 392);
+            this.shadingPage.Size = new System.Drawing.Size(169, 392);
             this.shadingPage.TabIndex = 1;
             this.shadingPage.Text = "Shading";
             this.shadingPage.UseVisualStyleBackColor = true;
@@ -107,7 +107,7 @@
             // 
             this.camerasPage.Location = new System.Drawing.Point(4, 24);
             this.camerasPage.Name = "camerasPage";
-            this.camerasPage.Size = new System.Drawing.Size(219, 392);
+            this.camerasPage.Size = new System.Drawing.Size(169, 392);
             this.camerasPage.TabIndex = 2;
             this.camerasPage.Text = "Cameras";
             // 
@@ -115,7 +115,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(633, 450);
+            this.ClientSize = new System.Drawing.Size(1342, 450);
             this.Controls.Add(this.tableLayoutPanel1);
             this.DoubleBuffered = true;
             this.MinimumSize = new System.Drawing.Size(600, 400);

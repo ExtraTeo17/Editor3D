@@ -30,8 +30,22 @@ namespace Editor3D.Utilities
         internal Vector Render(IDisplayer displayer, PipelineInfo info)
         {
             Vector viewVector = info.GetViewMatrix().MultipliedBy(this);
-            Vector ndcVector = info.GetProjectionMatrix().MultipliedBy(viewVector).DivideByW();
-            Vector screenVector = ndcVector.InScreenSpace(info.GetScreenWidth(), info.GetScreenHeight());
+            Vector clipVector = info.GetProjectionMatrix().MultipliedBy(viewVector);//.DivideByW();
+            Vector ndcVector = clipVector.Clone().DivideByW();
+            Matrix screenMatrix = Matrix.Screen(info.GetScreenWidth(), info.GetScreenHeight());
+            Vector screenVector = screenMatrix.MultipliedBy(ndcVector);
+            screenVector.y = info.GetScreenHeight() - screenVector.y;
+            /*if (x == 4 && y == 10 && z == 3)
+            {
+                Console.WriteLine("world = " + ToString());
+                Console.WriteLine("VIEW MATRIX: \n" + info.GetViewMatrix());
+                Console.WriteLine("view = " + viewVector);
+                Console.WriteLine("PROJECTION MATRIX: \n" + info.GetProjectionMatrix());
+                Console.WriteLine("clip = " + clipVector);
+                Console.WriteLine("ndc = " + ndcVector);
+                Console.WriteLine("screen = " + screenVector);
+                Console.WriteLine();
+            }*/
             if (info.ShouldRenderLines())
             {
                 displayer.Display((int)screenVector.x, (int)screenVector.y, screenVector.z, Color.Black);
@@ -129,7 +143,12 @@ namespace Editor3D.Utilities
 
         public override string ToString()
         {
-            return "Vector [" + x + ", " + y + ", " + z + ", " + w + "]";
+            return "Vector [" + Cut(x) + ", " + Cut(y) + ", " + Cut(z) + ", " + Cut(w) + "]";
+        }
+
+        private String Cut(double d)
+        {
+            return String.Format("{0:0.00}", d);
         }
     }
 }

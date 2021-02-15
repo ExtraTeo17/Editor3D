@@ -31,6 +31,19 @@ namespace Editor3D.Utilities
             matrix[3, height] = vector.w;
         }
 
+        internal static Matrix Screen(int width, int height)
+        {
+            Matrix screenMatrix = new Matrix();
+            screenMatrix.matrix[0, 0] = width / 2;
+            screenMatrix.matrix[3, 0] = width / 2;
+            screenMatrix.matrix[1, 1] = height / 2;
+            screenMatrix.matrix[3, 1] = height / 2;
+            screenMatrix.matrix[2, 2] = 0.5;
+            screenMatrix.matrix[3, 2] = 0.5;
+            screenMatrix.matrix[3, 3] = 1;
+            return screenMatrix;
+        }
+
         private void FillColumn(int width, Vector vector)
         {
             matrix[width, 0] = vector.x;
@@ -45,9 +58,9 @@ namespace Editor3D.Utilities
             double ctg = 1 / Math.Tan(fieldOfView / 2);
             projectionMatrix.matrix[0, 0] = ctg / aspect;
             projectionMatrix.matrix[1, 1] = ctg;
-            projectionMatrix.matrix[2, 2] = (farPlane + nearPlane) / (farPlane - nearPlane);
+            projectionMatrix.matrix[2, 2] = -(farPlane + nearPlane) / (farPlane - nearPlane);
             projectionMatrix.matrix[3, 2] = ((-2) * farPlane * nearPlane) / (farPlane - nearPlane);
-            projectionMatrix.matrix[2, 3] = 1;
+            projectionMatrix.matrix[2, 3] = -1;
             return projectionMatrix;
         }
 
@@ -96,6 +109,19 @@ namespace Editor3D.Utilities
             matrix[3, 0] += x;
             matrix[3, 1] += y;
             matrix[3, 2] += z;
+        }
+
+        public override string ToString()
+        {
+            return "[" + Cut(matrix[0, 0]) + ", " + Cut(matrix[1, 0]) + ", " + Cut(matrix[2, 0]) + ", " + Cut(matrix[3, 0]) + "]\n" +
+                "[" + Cut(matrix[0, 1]) + ", " + Cut(matrix[1, 1]) + ", " + Cut(matrix[2, 1]) + ", " + Cut(matrix[3, 1]) + "]\n" +
+                "[" + Cut(matrix[0, 2]) + ", " + Cut(matrix[1, 2]) + ", " + Cut(matrix[2, 2]) + ", " + Cut(matrix[3, 2]) + "]\n" +
+                "[" + Cut(matrix[0, 3]) + ", " + Cut(matrix[1, 3]) + ", " + Cut(matrix[2, 3]) + ", " + Cut(matrix[3, 3]) + "]\n";
+        }
+
+        private String Cut(double d)
+        {
+            return String.Format("{0:0.00}", d);
         }
     }
 }
