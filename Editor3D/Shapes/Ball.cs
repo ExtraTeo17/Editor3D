@@ -101,8 +101,8 @@ namespace Editor3D.Shapes
         private void InitializeSouthTriangle(double latUp, double lonLeft, double lonRight)
         {
             Vector pos1 = new Vector(0, -radius, 0, 1);
-            Vector pos3 = GeographicToScene(latUp, lonLeft);
-            Vector pos2 = GeographicToScene(latUp, lonRight);
+            Vector pos2 = GeographicToScene(latUp, lonLeft);
+            Vector pos3 = GeographicToScene(latUp, lonRight);
             InitializeTriangle(pos1, pos2, pos3);
         }
 

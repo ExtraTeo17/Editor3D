@@ -34,7 +34,7 @@ namespace Editor3D.Utilities
             Vector ndcVector = clipVector.Clone().DivideByW();
             Matrix screenMatrix = Matrix.Screen(info.GetScreenWidth(), info.GetScreenHeight());
             Vector screenVector = screenMatrix.MultipliedBy(ndcVector);
-            screenVector.y = info.GetScreenHeight() - screenVector.y;
+            screenVector.y = info.GetScreenHeight() - screenVector.y; // TODO: Beware of exception
             /*if (x == 4 && y == 10 && z == 3)
             {
                 Console.WriteLine("world = " + ToString());

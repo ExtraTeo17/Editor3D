@@ -16,6 +16,8 @@ namespace Editor3D.Utilities
         private readonly Vector normalVector;
         private readonly GourandInfo gourandInfo = new GourandInfo();
 
+        private bool trace = false;
+
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {
             v1 = new Vertex(pos1, normalVector);
@@ -99,6 +101,16 @@ namespace Editor3D.Utilities
             vertices.Sort(CompareByY);
             List<Vector> positions = new List<Vector>() { vertices[0].GetScreenPosition(),
                 vertices[1].GetScreenPosition(), vertices[2].GetScreenPosition() };
+
+            if (v3.GetScreenPosition().x > 227 && v3.GetScreenPosition().x < 228 && v3.GetScreenPosition().y > 209 && v3.GetScreenPosition().y < 211
+                && v1.GetScreenPosition().x > 228 && v1.GetScreenPosition().x < 229)
+            {
+                Console.WriteLine(v1.GetScreenPosition() + ", " + v2.GetScreenPosition() + ", " + v3.GetScreenPosition());
+                color = Color.Cyan;
+                Console.WriteLine(vertices[0].GetScreenPosition());
+                trace = true;
+            }
+
             if (displayer.GetShading() == Shading.Gourand)
             {
                 PrepareGourandVertexIntensities(color, lights, cameraPos, vertices);
@@ -124,13 +136,15 @@ namespace Editor3D.Utilities
                 FillBottomTriangle(displayer, positions[0], positions[1], v4, color, lights);
                 FillTopTriangle(displayer, positions[1], v4, positions[2], color, lights);
             }
+
+            trace = false;
         }
 
         private void FillTopTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
             Color color, List<Light> lights)
         {
-            double d1 = (v3.x - v1.x) / (v3.y - v1.y);
-            double d2 = (v3.x - v2.x) / (v3.y - v2.y);
+            double d1 = (v3.x - v1.x) / Math.Ceiling(v3.y - v1.y);
+            double d2 = (v3.x - v2.x) / Math.Ceiling(v3.y - v2.y);
             double x1 = v3.x + 1;
             double x2 = v3.x + 1;
             for (int scanline = (int)v3.y; scanline > v1.y; --scanline)
@@ -156,11 +170,11 @@ namespace Editor3D.Utilities
         private void FillBottomTriangle(IDisplayer displayer, Vector v1, Vector v2, Vector v3,
             Color color, List<Light> lights)
         {
-            double d1 = (v2.x - v1.x) / (v2.y - v1.y);
-            double d2 = (v3.x - v1.x) / (v3.y - v1.y);
+            double d1 = (v2.x - v1.x) / Math.Ceiling(v2.y - v1.y);
+            double d2 = (v3.x - v1.x) / Math.Ceiling(v3.y - v1.y);
             double x1 = v1.x + 1;
             double x2 = v1.x + 1;
-            for (int scanline = (int)v1.y; scanline <= v2.y; ++scanline)
+            for (int scanline = (int)v1.y; scanline < v2.y; ++scanline)
             {
                 Color leftInsensity = new Color();
                 Color rightIntensity = new Color();
@@ -171,6 +185,8 @@ namespace Editor3D.Utilities
                     rightIntensity = InterpolateColorGourandShading(v3.y, v1.y, scanline,
                         v3.GetColor(), v1.GetColor());
                 }
+                if (trace)
+                    Console.WriteLine("X1: " + x1 + ", X2: " + x2);
                 RenderHorizontalLine(displayer, (int)x1, (int)x2, scanline,
                     InterpolateZ(v2.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
                     InterpolateZ(v3.z, v1.z, (double)(scanline - (int)v1.y) / (double)((int)v2.y - (int)v1.y)),
