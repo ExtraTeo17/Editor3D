@@ -76,10 +76,11 @@ namespace Editor3D
 
         private void PrepareStaticCamera()
         {
-            Vector cameraPosition = new Vector(600, 500, 900, 1);
+            //Vector cameraPosition = new Vector(600, 500, 900, 1);
+            Vector cameraPosition = new Vector(500, 800, 1000, 1);
             Vector observedPosition = new Vector(0, 0, 0, 1);
             double nearPlane = 1; // 15
-            double farPlane = 2000; // 45
+            double farPlane = 4000; // 45
             double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             cameras.Add(new Camera(cameraPosition, observedPosition,
@@ -194,10 +195,36 @@ namespace Editor3D
 
         private void PrepareTrack()
         {
-            Color trackColor = Color.Blue;
-            AddCuboid(100, 10, 300, trackColor, -50, 0, -150);
+            Color trackColor = Color.Cyan;
+            /*AddCuboid(100, 10, 300, trackColor, -50, 0, -150);
             AddCuboid(100, 10, 300, trackColor, -50, 0, 150);
-            AddCuboid(300, 10, 100, trackColor, 120.71068, 0, 520.71068);
+            AddCuboid(300, 10, 100, trackColor, 120.71068, 0, 520.71068);*/
+            double xDiff = 92;
+            double zDiff = 220;
+            int degreeDiff = -45;
+            double trackWidth = 300, trackBreadth = 100, trackThickness = 10;
+
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, 0, 0, 0);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, 0, 0, trackWidth);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, xDiff, 0, trackWidth + zDiff, degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, xDiff + zDiff, 0, trackWidth + zDiff + xDiff, 2 * degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, xDiff + 2 * zDiff, 0, trackWidth + zDiff, 3 * degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, 2 * xDiff + 2 * zDiff, 0, trackWidth, 4 * degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, xDiff + 2 * zDiff, 0, trackWidth - zDiff, 5 * degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, Color.Pink, xDiff + zDiff + 20, 80, 0, 6 * degreeDiff, Axis.Y);
+            cuboids.Last().Rotate(-30, Axis.Z);
+
+            AddCuboid(trackBreadth, trackThickness, 400, Color.Pink, 0, 155, 0, 2 * degreeDiff, Axis.Y);
+
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, 0, 0, 0);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, 0, 0, -trackWidth);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, -xDiff, 0, -(trackWidth + zDiff), degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, -(xDiff + zDiff), 0, -(trackWidth + zDiff + xDiff), 2 * degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, -(xDiff + 2 * zDiff), 0, -(trackWidth + zDiff), 3 * degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, -(2 * xDiff + 2 * zDiff), 0, -trackWidth, 4 * degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, trackColor, -(xDiff + 2 * zDiff), 0, -(trackWidth - zDiff), 5 * degreeDiff, Axis.Y);
+            AddCuboid(trackBreadth, trackThickness, trackWidth, Color.Pink, -(xDiff + zDiff + 20), 80, 0, 6 * degreeDiff, Axis.Y);
+            cuboids.Last().Rotate(30, Axis.Z);
         }
 
         private void PrepareRoomWalls()
@@ -220,6 +247,16 @@ namespace Editor3D
             double transX, double transY, double transZ)
         {
             Cuboid cuboid = new Cuboid(x, y, z, color);
+            cuboid.Translate(transX, transY, transZ);
+            cuboids.Add(cuboid);
+        }
+
+        private void AddCuboid(double x, double y, double z, Color color,
+            double transX, double transY, double transZ,
+            int degrees, Axis axis)
+        {
+            Cuboid cuboid = new Cuboid(x, y, z, color);
+            cuboid.Rotate(degrees, axis);
             cuboid.Translate(transX, transY, transZ);
             cuboids.Add(cuboid);
         }
