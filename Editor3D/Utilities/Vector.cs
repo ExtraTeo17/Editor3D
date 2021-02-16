@@ -156,6 +156,11 @@ namespace Editor3D.Utilities
             return new Vector(v * x, v * y, v * z, 0);
         }
 
+        internal Vector SummedWith(Vector vector)
+        {
+            return new Vector(x + vector.x, y + vector.y, z + vector.z, 0);
+        }
+
         internal Vector SubstractedBy(Vector vector)
         {
             return new Vector(x - vector.x, y - vector.y, z - vector.z, 0);
