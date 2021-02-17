@@ -16,7 +16,7 @@ namespace Editor3D
     {
         private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 20;
-        private Shading SHADING = Shading.Flat;
+        private Shading SHADING = Shading.Phong;
         private Camera CURRENT_CAMERA;
 
         private Bitmap bitmap;
@@ -25,7 +25,9 @@ namespace Editor3D
         private List<Cuboid> cuboids = new List<Cuboid>();
         private List<Ball> balls = new List<Ball>();
         private double sign = 1;
+        private double spotSign = 1;
         private Camera staticCamera, spyingCamera, movingCamera;
+        private Light light, spotlight;
 
         public EditorForm()
         {
@@ -36,9 +38,9 @@ namespace Editor3D
         private void Debug()
         {
             InitializeComponent();
-            PrepareLights();
             PrepareScene();
             PrepareCameras();
+            PrepareLights();
             //RenderGraphics();
             UpdateScenePeriodically();
         }
@@ -134,7 +136,27 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            lights.Add(new Light(Color.White, Color.White, new Vector(-20, 10, -25, 1)));
+            Vector lightPos = new Vector(-20, -6, -25, 1);
+            AddLight(Color.White, lightPos);
+            Vector spotlightPos = new Vector(20, 6, -25, 1);
+            AddSpotlight(Color.White, spotlightPos, spotlightPos.DirectionTo(new Vector(0, 0, -40, 1)).Normalize(),
+                0.96, 1);
+        }
+
+        private void AddLight(Color color, Vector vector)
+        {
+            AddBall(1, Color.Yellow, vector.x, vector.y, vector.z);
+            this.light = new Light(color, color, vector, false, balls.Last());
+            lights.Add(light);
+        }
+
+        private void AddSpotlight(Color color, Vector vector, Vector spotlightDirection,
+            double spotlightRange, double spotlightExponent)
+        {
+            AddBall(1, Color.Red, vector.x, vector.y, vector.z);
+            this.spotlight = new Light(color, color, vector, true, balls.Last(), spotlightDirection,
+                spotlightRange, spotlightExponent);
+            lights.Add(spotlight);
         }
 
         private void PrepareBitmap()
@@ -176,15 +198,12 @@ namespace Editor3D
                 sign = -1;
             if (balls[0].GetWorldPosition().x < -20)
                 sign = 1;
-            //balls[0].Rotate(1, Axis.X);
             balls[0].Rotate(1, Axis.Y);
-            //balls[0].Rotate(1, Axis.Z);
-            //balls[1].Translate(-0.1, 0, 0);
-            //cuboids[0].Translate(0, 1, 0);
-            //cuboids[0].Rotate(1, Axis.Y);
-            //cameras[0].Rotate(1, Axis.Y);
-            //double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
-            //cameras[0].UpdateProperties(aspect);
+            if (spotlight.lightBall.GetWorldPosition().x < 14)
+                spotSign = -1;
+            if (spotlight.lightBall.GetWorldPosition().x > 20)
+                spotSign = 1;
+            spotlight.Translate(-0.5 * spotSign, -0.5 * spotSign, 0);
             UpdateCameras();
             RenderGraphics();
         }
@@ -217,16 +236,19 @@ namespace Editor3D
             {
                 cuboid.Render(this, GeneratePipelineInfo());
             }
-            // TODO: Add other objects
             pictureBox1.Refresh();
         }
 
-        private void PrepareScene() // WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+        private void PrepareScene()
         {
             AddBall(10, Color.Green, -20, 0, -40);
             //AddCuboid(10, 10, 10, Color.Green, -20, -10, -40);
             for (int i = -20; i <= 20; i += 4)
                 AddCuboid(2, 2, 2, Color.Cyan, i, 12, -40);
+            for (int i = -20, j = 0; i <= 20; i += 4, j += 2)
+                AddCuboid(2, 2, 2, Color.Red, i, 4, -52 - j);
+            for (int i = -20; i <= 20; i += 4)
+                AddCuboid(2, 2, 2, Color.Orchid, i, -4, -28);
         }
 
         private void PrepareTrackScene()
@@ -327,11 +349,6 @@ namespace Editor3D
             return SHADING;
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void button4_Click(object sender, EventArgs e)
         {
             this.SHADING = Shading.Flat;
@@ -350,6 +367,66 @@ namespace Editor3D
         private void button3_Click(object sender, EventArgs e)
         {
             this.CURRENT_CAMERA = movingCamera;
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                light.on = true;
+                light.lightBall.visible = true;
+            }
+            else
+            {
+                light.on = false;
+                light.lightBall.visible = false;
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            spotlight.RotateSpotlight(5, Axis.Y);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            spotlight.RotateSpotlight(5, Axis.X);
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            spotlight.RotateSpotlight(-5, Axis.X);
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            spotlight.RotateSpotlight(-5, Axis.Y);
+        }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox4.Checked)
+            {
+                spotSign = 0;
+            }
+            else
+            {
+                spotSign = -1;
+            }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                spotlight.on = true;
+                spotlight.lightBall.visible = true;
+            }
+            else
+            {
+                spotlight.on = false;
+                spotlight.lightBall.visible = false;
+            }
         }
 
         private void button5_Click(object sender, EventArgs e)

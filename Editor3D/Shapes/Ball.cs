@@ -14,6 +14,7 @@ namespace Editor3D.Shapes
         private Matrix rotationMatrix;
         private Matrix translationMatrix;
         private readonly Color color;
+        internal bool visible = true;
 
         public Ball(double radius, int latitudeDivisions, int longitudeDivisions,
             Color color)
@@ -144,6 +145,8 @@ namespace Editor3D.Shapes
 
         internal void Render(IDisplayer displayer, PipelineInfo info)
         {
+            if (!visible)
+                return;
             info.SetRotationMatrix(rotationMatrix);
             info.SetTranslationMatrix(translationMatrix);
             foreach (CuboidWall wall in walls)

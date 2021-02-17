@@ -100,7 +100,7 @@ namespace Editor3D.Utilities
             matrix = Matrix.Rotation(radians, axis).MultipliedBy(this).matrix;
         }
 
-        private static Matrix Rotation(double radians, Axis axis)
+        internal static Matrix Rotation(double radians, Axis axis)
         {
             Matrix matrix = Matrix.Unitary();
             double minusSin = -Math.Sin(radians);

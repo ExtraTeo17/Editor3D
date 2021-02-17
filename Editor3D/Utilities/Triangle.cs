@@ -10,7 +10,6 @@ namespace Editor3D.Utilities
         private const double ks = 0.4;
         private const double ka = 0.3;
         private const double alfa = 1;
-        private Color Ia = Color.White;
 
         private readonly Vertex v1, v2, v3;
         private Vector normalVector;
@@ -354,6 +353,8 @@ namespace Editor3D.Utilities
             Color intensity = Color.FromArgb(0, 0, 0); // TODO: try to change to color from parameter
             foreach (Light light in lights)
             {
+                if (!light.on)
+                    continue;
                 Vector lightPos = light.GetPosition();
                 Vector L = pointPos.DirectionTo(lightPos).Normalize();
                 Vector N = pointNormalVector;
@@ -361,10 +362,30 @@ namespace Editor3D.Utilities
                 Vector R = (N.MultipliedBy(2.0 * L.DotProduct(N))).SubstractedBy(L).Normalize();
                 Color diffuse = ColorMultipliedBy(light.Id, kd * L.DotProduct(N));
                 Color specular = ColorMultipliedBy(light.Is, ks * Math.Pow(R.DotProduct(V), alfa));
+                double spotlightFactor = 1;
+                bool isSpotlightInRange = false;
+                if (light.IsSpotlight())
+                {
+                    Vector minusSpotlightDirection = light.GetSpotlightDirection().NegatedWithoutW();
+                    double spotlightCosine = minusSpotlightDirection.DotProduct(L);
+                    if (spotlightCosine >= light.GetSpotlightRange())
+                    {
+                        spotlightFactor = Math.Pow(spotlightCosine, light.GetSpotlightExponent());
+                        isSpotlightInRange = true;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
                 Color diffuseSpecularSum = ColorSummedWith(diffuse, specular);
                 intensity = ColorSummedWith(intensity, diffuseSpecularSum);
+                if (isSpotlightInRange)
+                {
+                    intensity = ColorMultipliedBy(intensity, spotlightFactor);
+                }
             }
-            return ColorSummedWith(ColorMultipliedBy(color, ka), ColorMultipliedBy(intensity, ComputeIf())); // TODO: Fix ambient (Ia) to not be from shapes
+            return ColorSummedWith(ColorMultipliedBy(color, ka), ColorMultipliedBy(intensity, ComputeIf()));
         }
 
         private Color ColorSummedWith(Color color1, Color color2)
