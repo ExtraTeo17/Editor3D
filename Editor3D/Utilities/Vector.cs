@@ -153,12 +153,12 @@ namespace Editor3D.Utilities
 
         internal Vector MultipliedBy(double v)
         {
-            return new Vector(v * x, v * y, v * z, 0);
+            return new Vector(v * x, v * y, v * z, w);
         }
 
         internal Vector SummedWith(Vector vector)
         {
-            return new Vector(x + vector.x, y + vector.y, z + vector.z, 0);
+            return new Vector(x + vector.x, y + vector.y, z + vector.z, w);
         }
 
         internal Vector SubstractedBy(Vector vector)

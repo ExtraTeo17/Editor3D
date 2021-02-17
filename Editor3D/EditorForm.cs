@@ -16,7 +16,7 @@ namespace Editor3D
     {
         private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 20;
-        private const Shading SHADING = Shading.Gourand;
+        private Shading SHADING = Shading.Flat;
 
         private Bitmap bitmap;
         private List<Camera> cameras = new List<Camera>();
@@ -102,7 +102,7 @@ namespace Editor3D
 
         private void PrepareLights()
         {
-            lights.Add(new Light(Color.White, Color.White, new Vector(-20, 0, -25, 1)));
+            lights.Add(new Light(Color.White, Color.White, new Vector(0, 5, -10, 1)));
         }
 
         private void PrepareBitmap()
@@ -184,7 +184,7 @@ namespace Editor3D
 
         private void PrepareScene() // WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
         {
-            AddBall(10, Color.Green, -20, -10, -40);
+            AddBall(10, Color.Green, 0, 0, -40);
             //AddCuboid(10, 10, 10, Color.Green, -20, -10, -40);
         }
 
@@ -290,6 +290,21 @@ namespace Editor3D
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            this.SHADING = Shading.Flat;
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            this.SHADING = Shading.Gourand;
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            this.SHADING = Shading.Phong;
         }
     }
 }

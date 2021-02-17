@@ -228,6 +228,7 @@
             this.button4.TabIndex = 0;
             this.button4.Text = "Stale";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button5
             // 
@@ -240,6 +241,7 @@
             this.button5.TabIndex = 1;
             this.button5.Text = "Gouranda";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button6
             // 
@@ -252,6 +254,7 @@
             this.button6.TabIndex = 2;
             this.button6.Text = "Phonga";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // groupBox3
             // 

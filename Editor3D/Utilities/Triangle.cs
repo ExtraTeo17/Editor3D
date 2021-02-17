@@ -141,24 +141,32 @@ namespace Editor3D.Utilities
             {
                 PrepareGourandVertexIntensities(color, lights, cameraPos, vertices);
             }
+            else if (displayer.GetShading() == Shading.Flat)
+            {
+                color = ComputeColorPhongModel(color, lights, GetWorldMiddle(), cameraPos, normalVector);
+            }
             Color c0 = vertices[0].GetScreenPosition().GetColor();
             Color c1 = vertices[1].GetScreenPosition().GetColor();
             Color c2 = vertices[2].GetScreenPosition().GetColor();
             Vector n0 = null, n1 = null, n2 = null;
+            Vector w0 = null, w1 = null, w2 = null;
             if (displayer.GetShading() == Shading.Phong)
             {
                 n0 = vertices[0].GetNormalVector();
                 n1 = vertices[1].GetNormalVector();
                 n2 = vertices[2].GetNormalVector();
+                w0 = vertices[0].GetWorldPosition();
+                w1 = vertices[1].GetWorldPosition();
+                w2 = vertices[2].GetWorldPosition();
             }
 
             if (y1 == y2)
             {
-                FillBottomTriangle(displayer, x0, y0, z0, c0, n0, x1, y1, z1, c1, n1, x2, y2, z2, c2, n2, color, lights, cameraPos);
+                FillBottomTriangle(displayer, x0, y0, z0, c0, n0, w0, x1, y1, z1, c1, n1, w1, x2, y2, z2, c2, n2, w2, color, lights, cameraPos);
             }
             else if (y0 == y1)
             {
-                FillTopTriangle(displayer, x0, y0, z0, c0, n0, x1, y1, z1, c1, n1, x2, y2, z2, c2, n2, color, lights, cameraPos);
+                FillTopTriangle(displayer, x0, y0, z0, c0, n0, w0, x1, y1, z1, c1, n1, w1, x2, y2, z2, c2, n2, w2, color, lights, cameraPos);
             }
             else
             {
@@ -166,7 +174,7 @@ namespace Editor3D.Utilities
                 int y3 = y1;
                 double z3 = InterpolateZ(z0, z2, (double)(y1 - y0) / (double)(y2 - y0));
                 Color c3 = new Color();
-                Vector n3 = null;
+                Vector n3 = null, w3 = null;
                 if (displayer.GetShading() == Shading.Gourand)
                 {
                     c3 = InterpolateColorGourandShading(y2, y0, y1, c2, c0);
@@ -174,16 +182,31 @@ namespace Editor3D.Utilities
                 else if (displayer.GetShading() == Shading.Phong)
                 {
                     n3 = InterpolateNormalPhongShading(y2, y0, y1, n2, n0);
+                    w3 = InterpolateWorldPhongShading(y2, y0, y1, w2, w0);
                 }
-                FillBottomTriangle(displayer, x0, y0, z0, c0, n0, x1, y1, z1, c1, n1, x3, y3, z3, c3, n3, color, lights, cameraPos);
-                FillTopTriangle(displayer, x1, y1, z1, c1, n1, x3, y3, z3, c3, n3, x2, y2, z2, c2, n2, color, lights, cameraPos);
+                FillBottomTriangle(displayer, x0, y0, z0, c0, n0, w0, x1, y1, z1, c1, n1, w1, x3, y3, z3, c3, n3, w3, color, lights, cameraPos);
+                FillTopTriangle(displayer, x1, y1, z1, c1, n1, w1, x3, y3, z3, c3, n3, w3, x2, y2, z2, c2, n2, w2, color, lights, cameraPos);
             }
         }
 
+        private Vector GetWorldMiddle()
+        {
+            Vector w1 = v1.GetWorldPosition();
+            Vector w2 = v2.GetWorldPosition();
+            Vector w3 = v3.GetWorldPosition();
+            double a = w2.SubstractedBy(w3).Magnitude();
+            double b = w3.SubstractedBy(w1).Magnitude();
+            double c = w1.SubstractedBy(w2).Magnitude();
+            Vector A = w1.MultipliedBy(a / (a + b + c));
+            Vector B = w2.MultipliedBy(b / (a + b + c));
+            Vector C = w3.MultipliedBy(c / (a + b + c));
+            return A.SummedWith(B).SummedWith(C);
+        }
+
         private void FillTopTriangle(IDisplayer displayer,
-            int x0, int y0, double z0, Color c0, Vector n0,
-            int x1, int y1, double z1, Color c1, Vector n1,
-            int x2, int y2, double z2, Color c2, Vector n2,
+            int x0, int y0, double z0, Color c0, Vector n0, Vector w0,
+            int x1, int y1, double z1, Color c1, Vector n1, Vector w1,
+            int x2, int y2, double z2, Color c2, Vector n2, Vector w2,
             Color color, List<Light> lights, Vector cameraPos)
         {
             double d1 = (double)(x2 - x0) / (double)(y2 - y0 + 1);
@@ -194,7 +217,7 @@ namespace Editor3D.Utilities
             {
                 Color leftInsensity = new Color();
                 Color rightIntensity = new Color();
-                Vector leftNormal = null, rightNormal = null;
+                Vector leftNormal = null, rightNormal = null, leftWorld = null, rightWorld = null;
                 if (displayer.GetShading() == Shading.Gourand)
                 {
                     leftInsensity = InterpolateColorGourandShading(y2, y0, sc, c2, c0);
@@ -204,20 +227,22 @@ namespace Editor3D.Utilities
                 {
                     leftNormal = InterpolateNormalPhongShading(y2, y0, sc, n2, n0);
                     rightNormal = InterpolateNormalPhongShading(y2, y1, sc, n2, n1);
+                    leftWorld = InterpolateWorldPhongShading(y2, y0, sc, w2, w0);
+                    rightWorld = InterpolateWorldPhongShading(y2, y1, sc, w2, w1);
                 }
                 xa -= d1;
                 xb -= d2;
                 RenderHorizontalLine(displayer, (int)xa, (int)xb, sc,
                     InterpolateZ(z0, z2, (double)(sc - y0) / (double)(y2 - y0)),
                     InterpolateZ(z1, z2, (double)(sc - y0) / (double)(y2 - y0)),
-                    color, lights, leftInsensity, rightIntensity, leftNormal, rightNormal, cameraPos);
+                    color, lights, leftInsensity, rightIntensity, leftNormal, rightNormal, cameraPos, leftWorld, rightWorld);
             }
         }
 
         private void FillBottomTriangle(IDisplayer displayer,
-            int x0, int y0, double z0, Color c0, Vector n0,
-            int x1, int y1, double z1, Color c1, Vector n1,
-            int x2, int y2, double z2, Color c2, Vector n2,
+            int x0, int y0, double z0, Color c0, Vector n0, Vector w0,
+            int x1, int y1, double z1, Color c1, Vector n1, Vector w1,
+            int x2, int y2, double z2, Color c2, Vector n2, Vector w2,
             Color color, List<Light> lights, Vector cameraPos)
         {
             double d1 = (double)(x1 - x0) / (double)(y1 - y0 + 1);
@@ -228,7 +253,7 @@ namespace Editor3D.Utilities
             {
                 Color leftInsensity = new Color();
                 Color rightIntensity = new Color();
-                Vector leftNormal = null, rightNormal = null;
+                Vector leftNormal = null, rightNormal = null, leftWorld = null, rightWorld = null;
                 if (displayer.GetShading() == Shading.Gourand)
                 {
                     leftInsensity = InterpolateColorGourandShading(y1, y0, sc, c1, c0);
@@ -238,13 +263,15 @@ namespace Editor3D.Utilities
                 {
                     leftNormal = InterpolateNormalPhongShading(y1, y0, sc, n1, n0);
                     rightNormal = InterpolateNormalPhongShading(y2, y0, sc, n2, n0);
+                    leftWorld = InterpolateWorldPhongShading(y1, y0, sc, w1, w0);
+                    rightWorld = InterpolateWorldPhongShading(y2, y0, sc, w2, w0);
                 }
                 xa += d1;
                 xb += d2;
                 RenderHorizontalLine(displayer, (int)xa, (int)xb, sc,
                     InterpolateZ(z0, z1, (double)(sc - y0) / (double)(y1 - y0)),
                     InterpolateZ(z0, z2, (double)(sc - y0) / (double)(y1 - y0)),
-                    color, lights, leftInsensity, rightIntensity, leftNormal, rightNormal, cameraPos);
+                    color, lights, leftInsensity, rightIntensity, leftNormal, rightNormal, cameraPos, leftWorld, rightWorld);
             }
         }
 
@@ -259,11 +286,18 @@ namespace Editor3D.Utilities
         {
             double q = (intervalEnd - intervalStart) == 0 ? 0 : (intervalPos - intervalStart) / (intervalEnd - intervalStart);
             Vector vector = normalStart.MultipliedBy(1 - q).SummedWith(normalEnd.MultipliedBy(q));
+            return vector.Normalize();
+        }
+        private Vector InterpolateWorldPhongShading(double intervalEnd, double intervalStart, int intervalPos, Vector worldEnd, Vector worldStart)
+        {
+            double q = (intervalEnd - intervalStart) == 0 ? 0 : (intervalPos - intervalStart) / (intervalEnd - intervalStart);
+            Vector vector = worldStart.MultipliedBy(1 - q).SummedWith(worldEnd.MultipliedBy(q));
             return vector;
         }
 
         private void RenderHorizontalLine(IDisplayer displayer, int x1, int x2, int y, double z1, double z2,
-            Color color, List<Light> lights, Color gourandIntensity1, Color gourandIntensity2, Vector normal1, Vector normal2, Vector cameraPos)
+            Color color, List<Light> lights, Color gourandIntensity1, Color gourandIntensity2, Vector normal1, Vector normal2,
+            Vector cameraPos, Vector world1, Vector world2)
         {
             double z = 0;
             if (x1 > x2)
@@ -277,25 +311,41 @@ namespace Editor3D.Utilities
                 Color tmp3 = gourandIntensity1;
                 gourandIntensity1 = gourandIntensity2;
                 gourandIntensity2 = tmp3;
-                Vector nTmp = normal1.Clone();
-                normal1 = normal2.Clone();
-                normal2 = nTmp;
+                Vector nTmp = null;
+                if (normal1 != null)
+                {
+                    nTmp = normal1.Clone();
+                    normal1 = normal2.Clone();
+                    normal2 = nTmp;
+                }
+                Vector wTmp = null;
+                if (world1 != null)
+                {
+                    wTmp = world1.Clone();
+                    world1 = world2.Clone();
+                    world2 = wTmp;
+                }
             }
             for (int x = x1; x <= x2; ++x)
             {
+                Color usedColor = new Color();
                 if (displayer.GetShading() == Shading.Gourand)
                 {
-                    color = InterpolateColorGourandShading(x2, x1, x, gourandIntensity2, gourandIntensity1);
+                    usedColor = InterpolateColorGourandShading(x2, x1, x, gourandIntensity2, gourandIntensity1);
                 }
                 else if (displayer.GetShading() == Shading.Phong)
                 {
                     Vector normal = InterpolateNormalPhongShading(x2, x1, x, normal2, normal1);
-                    color = ComputeColorPhongModel(color, lights, vertex.GetWorldPosition(), cameraPos, normal);
+                    Vector world = InterpolateWorldPhongShading(x2, x1, x, world2, world1);
+                    usedColor = ComputeColorPhongModel(color, lights, world, cameraPos, normal);
                 }
-                // PHONG SHADING CASE
+                else
+                {
+                    usedColor = color;
+                }
                 double q = x2 == x1 ? 0 : (x - x1) / (x2 - x1);
                 z = InterpolateZ(z1, z2, q);
-                displayer.Display(x, y, z, color); // TODO: consider changing to primitive types instead of passing Vector
+                displayer.Display(x, y, z, usedColor); // TODO: consider changing to primitive types instead of passing Vector
             }
         }
 
