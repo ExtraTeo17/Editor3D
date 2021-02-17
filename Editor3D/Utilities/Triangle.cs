@@ -14,8 +14,8 @@ namespace Editor3D.Utilities
         private readonly Vertex v1, v2, v3;
         private Vector normalVector;
 
-        private bool trace = false;
         private bool shouldBeDisplayed = false;
+        private Color lineColor = Color.Black;
 
         public Triangle(Vector pos1, Vector pos2, Vector pos3, Vector normalVector)
         {
@@ -86,11 +86,11 @@ namespace Editor3D.Utilities
             return vertex.GetWorldPosition().DirectionTo(info.GetCameraPosition()).DotProduct(normalVector) > 0;
         }
 
-        private void PrepareGourandVertexIntensities(Color color, List<Light> lights, Vector cameraPos, List<Vertex> vertices)
+        private void PrepareGourandVertexIntensities(Color color, List<Light> lights, Vector cameraPos, List<Vertex> vertices, bool isFog)
         {
             foreach (Vertex vertex in vertices)
             {
-                vertex.GetScreenPosition().SetColor(ComputeColorPhongModel(color, lights, vertex.GetWorldPosition(), cameraPos, vertex.GetNormalVector()));
+                vertex.GetScreenPosition().SetColor(ComputeColorPhongModel(color, lights, vertex.GetWorldPosition(), cameraPos, vertex.GetNormalVector(), isFog));
             }
         }
 
@@ -105,16 +105,17 @@ namespace Editor3D.Utilities
         {
             if (ShouldBeDisplayed(v1, info))
             {
-                RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
+                if (displayer.IsFog())
+                    lineColor = ComputeFog(Color.Black, v1.GetWorldPosition(), info.GetCameraPosition());
+                else
+                    lineColor = Color.Black;
+                RenderLineBresenham(displayer,(int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
                     (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y, v1.GetScreenPosition().z, v2.GetScreenPosition().z);
-                RenderLineBresenham(displayer, (int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
+                RenderLineBresenham(displayer,(int)v1.GetScreenPosition().x, (int)v1.GetScreenPosition().y,
                     (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y, v1.GetScreenPosition().z, v3.GetScreenPosition().z);
                 RenderLineBresenham(displayer, (int)v2.GetScreenPosition().x, (int)v2.GetScreenPosition().y,
                     (int)v3.GetScreenPosition().x, (int)v3.GetScreenPosition().y, v2.GetScreenPosition().z, v3.GetScreenPosition().z);
             }
-            if (trace)
-                Console.WriteLine("END OF IT ALL");
-            trace = false;
         }
 
         public static int CompareByY(Vertex v1, Vertex v2)
@@ -138,11 +139,11 @@ namespace Editor3D.Utilities
 
             if (displayer.GetShading() == Shading.Gourand)
             {
-                PrepareGourandVertexIntensities(color, lights, cameraPos, vertices);
+                PrepareGourandVertexIntensities(color, lights, cameraPos, vertices, displayer.IsFog());
             }
             else if (displayer.GetShading() == Shading.Flat)
             {
-                color = ComputeColorPhongModel(color, lights, GetWorldMiddle(), cameraPos, normalVector);
+                color = ComputeColorPhongModel(color, lights, GetWorldMiddle(), cameraPos, normalVector, displayer.IsFog());
             }
             Color c0 = vertices[0].GetScreenPosition().GetColor();
             Color c1 = vertices[1].GetScreenPosition().GetColor();
@@ -336,7 +337,7 @@ namespace Editor3D.Utilities
                 {
                     Vector normal = InterpolateNormalPhongShading(x2, x1, x, normal2, normal1);
                     Vector world = InterpolateWorldPhongShading(x2, x1, x, world2, world1);
-                    usedColor = ComputeColorPhongModel(color, lights, world, cameraPos, normal);
+                    usedColor = ComputeColorPhongModel(color, lights, world, cameraPos, normal, displayer.IsFog());
                 }
                 else
                 {
@@ -348,7 +349,7 @@ namespace Editor3D.Utilities
             }
         }
 
-        private Color ComputeColorPhongModel(Color color, List<Light> lights, Vector pointPos, Vector cameraPos, Vector pointNormalVector) // TODO: Consider not rounding to ints upon every multiplying
+        private Color ComputeColorPhongModel(Color color, List<Light> lights, Vector pointPos, Vector cameraPos, Vector pointNormalVector, bool isFog) // TODO: Consider not rounding to ints upon every multiplying
         {
             Color intensity = Color.FromArgb(0, 0, 0); // TODO: try to change to color from parameter
             foreach (Light light in lights)
@@ -385,7 +386,29 @@ namespace Editor3D.Utilities
                     intensity = ColorMultipliedBy(intensity, spotlightFactor);
                 }
             }
-            return ColorSummedWith(ColorMultipliedBy(color, ka), ColorMultipliedBy(intensity, ComputeIf()));
+            Color final = ColorSummedWith(ColorMultipliedBy(color, ka), ColorMultipliedBy(intensity, ComputeIf()));
+            if (isFog)
+                final = ComputeFog(final, pointPos, cameraPos);
+            return final;
+        }
+
+        private Color ComputeFog(Color color, Vector pointPos, Vector cameraPos)
+        {
+            int R = color.R;
+            int G = color.G;
+            int B = color.B;
+            int diffR = SystemColors.Control.R - R;
+            int diffG = SystemColors.Control.G - G;
+            int diffB = SystemColors.Control.B - B;
+            double distance = cameraPos.DistanceTo(pointPos) - EditorForm.NEAR_PLANE;
+            double fogFactor = distance / (EditorForm.FAR_PLANE - EditorForm.NEAR_PLANE);
+            diffR = (int)(diffR * fogFactor);
+            diffG = (int)(diffG * fogFactor);
+            diffB = (int)(diffB * fogFactor);
+            R = R + diffR > SystemColors.Control.R ? SystemColors.Control.R : R + diffR;
+            G = G + diffG > SystemColors.Control.G ? SystemColors.Control.G : G + diffG;
+            B = B + diffB > SystemColors.Control.B ? SystemColors.Control.B : B + diffB;
+            return Color.FromArgb(R < 0 ? 0 : R, G < 0 ? 0 : G, B < 0 ? 0 : B);
         }
 
         private Color ColorSummedWith(Color color1, Color color2)
@@ -453,7 +476,7 @@ namespace Editor3D.Utilities
             for (int x = x0; x < x1; ++x)
             {
                 double tmpZ = InterpolateZ(z0, z1, (double)(x - x0) / (double)(x1 - x0));
-                displayer.Display(x, y, tmpZ, Color.Black);
+                displayer.Display(x, y, tmpZ, lineColor);
                 if (d > 0)
                 {
                     y += yi;
@@ -491,7 +514,7 @@ namespace Editor3D.Utilities
             for (int y = y0; y < y1; ++y)
             {
                 tmpZ = InterpolateZ(z0, z1, (double)(y - y0) / (double)(y1 - y0));
-                displayer.Display(x, y, tmpZ, Color.Black);
+                displayer.Display(x, y, tmpZ, lineColor);
                 if (d > 0)
                 {
                     x += xi;

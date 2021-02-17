@@ -479,6 +479,7 @@
             this.checkBox3.TabIndex = 0;
             this.checkBox3.Text = "Wlaczona";
             this.checkBox3.UseVisualStyleBackColor = true;
+            this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // checkBox4
             // 

@@ -14,9 +14,13 @@ namespace Editor3D
 {
     public partial class EditorForm : Form, IDisplayer
     {
+        public static double NEAR_PLANE = 23;
+        public static double FAR_PLANE = 74;
+
         private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 20;
         private Shading SHADING = Shading.Phong;
+        private bool IS_FOG = false;
         private Camera CURRENT_CAMERA;
 
         private Bitmap bitmap;
@@ -102,8 +106,8 @@ namespace Editor3D
         {
             Vector observedPosition = balls[0].GetWorldPosition();
             Vector cameraPosition = observedPosition.Translate(new Vector(0, 0, 40, 1));
-            double nearPlane = 1; // 15
-            double farPlane = 300; // 45
+            double nearPlane = NEAR_PLANE; // 15
+            double farPlane = FAR_PLANE; // 45
             double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             movingCamera = new Camera(cameraPosition, observedPosition,
@@ -114,8 +118,8 @@ namespace Editor3D
         {
             Vector cameraPosition = new Vector(0, 0, 0, 1);
             Vector observedPosition = balls[0].GetWorldPosition();
-            double nearPlane = 1; // 15
-            double farPlane = 300; // 45
+            double nearPlane = NEAR_PLANE; // 15
+            double farPlane = FAR_PLANE; // 45
             double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             spyingCamera = new Camera(cameraPosition, observedPosition,
@@ -126,8 +130,8 @@ namespace Editor3D
         {
             Vector cameraPosition = new Vector(0, 0, 0, 1);
             Vector observedPosition = new Vector(0, 0, -40, 1);
-            double nearPlane = 1; // 15
-            double farPlane = 300; // 45
+            double nearPlane = NEAR_PLANE; // 15
+            double farPlane = FAR_PLANE; // 45
             double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
             staticCamera = new Camera(cameraPosition, observedPosition,
@@ -254,6 +258,11 @@ namespace Editor3D
         private void PrepareTrackScene()
         {
             PrepareTrack();
+        }
+
+        public bool IsFog()
+        {
+            return IS_FOG;
         }
 
         private void PrepareTrack()
@@ -412,6 +421,18 @@ namespace Editor3D
             else
             {
                 spotSign = -1;
+            }
+        }
+
+        private void checkBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox3.Checked)
+            {
+                IS_FOG = true;
+            }
+            else
+            {
+                IS_FOG = false;
             }
         }
 
