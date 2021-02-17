@@ -33,6 +33,25 @@ namespace Editor3D.Utilities
             return rotated;
         }
 
+        internal Vector Translate(Matrix translationMatrix)
+        {
+            Vector translated = translationMatrix.MultipliedBy(this);
+            return translated;
+        }
+
+        internal Vector Translate(Vector translationVector)
+        {
+            Matrix translation = Matrix.Translation(translationVector);
+            Vector translated = Translate(translation);
+            return translated;
+        }
+
+        internal Vector Rotate(Matrix rotationMatrix)
+        {
+            Vector rotated = rotationMatrix.MultipliedBy(this);
+            return rotated;
+        }
+
         /*internal Vector MakeModelCleanRotation(PipelineInfo info)
         {
             Vector rotated = info.GetModelMatrix().CleanRotation().MultipliedBy(this);

@@ -66,9 +66,19 @@ namespace Editor3D
             cameraRotationMatrix.Rotate(degrees * Math.PI / 180, axis);
         }
 
-        internal void UpdateProperties(double aspect)
+        internal void UpdateAspect(double aspect)
         {
             this.aspect = aspect;
+        }
+
+        internal void UpdateObservedPoint(Vector observedPosition)
+        {
+            this.observedPosition = observedPosition;
+        }
+
+        internal void UpdateCameraPosition(Vector position)
+        {
+            this.cameraPosition = position;
         }
     }
 }

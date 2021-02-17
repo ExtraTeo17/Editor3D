@@ -130,6 +130,12 @@ namespace Editor3D.Shapes
             return new Vector(x, y, z, 1);
         }
 
+        internal Vector GetWorldPosition()
+        {
+            Vector center = new Vector(0, 0, 0, 1);
+            return center.Translate(translationMatrix);
+        }
+
         private void InitializeWall(Vector pos1, Vector pos2, Vector pos3, Vector pos4)
         {
             CuboidWall wall = new CuboidWall(pos1, pos2, pos3, pos4);

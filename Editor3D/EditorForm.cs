@@ -17,14 +17,15 @@ namespace Editor3D
         private const bool SHOULD_RENDER_LINES = true;
         private const int FRAMES_PER_SECOND = 20;
         private Shading SHADING = Shading.Flat;
+        private Camera CURRENT_CAMERA;
 
         private Bitmap bitmap;
-        private List<Camera> cameras = new List<Camera>();
         private List<Light> lights = new List<Light>();
-        private int currentCameraIndex;
         private double[,] zBuffor;
         private List<Cuboid> cuboids = new List<Cuboid>();
         private List<Ball> balls = new List<Ball>();
+        private double sign = 1;
+        private Camera staticCamera, spyingCamera, movingCamera;
 
         public EditorForm()
         {
@@ -35,9 +36,9 @@ namespace Editor3D
         private void Debug()
         {
             InitializeComponent();
-            PrepareCameras();
             PrepareLights();
             PrepareScene();
+            PrepareCameras();
             //RenderGraphics();
             UpdateScenePeriodically();
         }
@@ -58,23 +59,23 @@ namespace Editor3D
 
         private void PrepareTrackCameras()
         {
-            PrepareStaticCamera();
-            PrepareSpyingCamera();
-            PrepareMovingCamera();
-            currentCameraIndex = 0;
+            PrepareTrackStaticCamera();
+            PrepareTrackSpyingCamera();
+            PrepareTrackMovingCamera();
+            CURRENT_CAMERA = staticCamera;
         }
 
-        private void PrepareMovingCamera()
+        private void PrepareTrackMovingCamera()
         {
             //throw new NotImplementedException();
         }
 
-        private void PrepareSpyingCamera()
+        private void PrepareTrackSpyingCamera()
         {
             //throw new NotImplementedException();
         }
 
-        private void PrepareStaticCamera()
+        private void PrepareTrackStaticCamera()
         {
             //Vector cameraPosition = new Vector(600, 500, 900, 1);
             Vector cameraPosition = new Vector(500, 800, 1000, 1);
@@ -83,11 +84,43 @@ namespace Editor3D
             double farPlane = 4000; // 45
             double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
-            cameras.Add(new Camera(cameraPosition, observedPosition,
-                nearPlane, farPlane, fieldOfView, aspect));
+            staticCamera = new Camera(cameraPosition, observedPosition,
+                nearPlane, farPlane, fieldOfView, aspect);
         }
 
         private void PrepareCameras()
+        {
+            PrepareStaticCamera();
+            PrepareSpyingCamera();
+            PrepareMovingCamera();
+            CURRENT_CAMERA = staticCamera;
+        }
+
+        private void PrepareMovingCamera()
+        {
+            Vector observedPosition = balls[0].GetWorldPosition();
+            Vector cameraPosition = observedPosition.Translate(new Vector(0, 0, 40, 1));
+            double nearPlane = 1; // 15
+            double farPlane = 300; // 45
+            double fieldOfView = Math.PI * 45 / 180;
+            double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
+            movingCamera = new Camera(cameraPosition, observedPosition,
+                nearPlane, farPlane, fieldOfView, aspect);
+        }
+
+        private void PrepareSpyingCamera()
+        {
+            Vector cameraPosition = new Vector(0, 0, 0, 1);
+            Vector observedPosition = balls[0].GetWorldPosition();
+            double nearPlane = 1; // 15
+            double farPlane = 300; // 45
+            double fieldOfView = Math.PI * 45 / 180;
+            double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
+            spyingCamera = new Camera(cameraPosition, observedPosition,
+                nearPlane, farPlane, fieldOfView, aspect);
+        }
+
+        private void PrepareStaticCamera()
         {
             Vector cameraPosition = new Vector(0, 0, 0, 1);
             Vector observedPosition = new Vector(0, 0, -40, 1);
@@ -95,14 +128,13 @@ namespace Editor3D
             double farPlane = 300; // 45
             double fieldOfView = Math.PI * 45 / 180;
             double aspect = (double)pictureBox1.Width / (double)pictureBox1.Height;
-            cameras.Add(new Camera(cameraPosition, observedPosition,
-                nearPlane, farPlane, fieldOfView, aspect));
-            currentCameraIndex = 0;
+            staticCamera = new Camera(cameraPosition, observedPosition,
+                nearPlane, farPlane, fieldOfView, aspect);
         }
 
         private void PrepareLights()
         {
-            lights.Add(new Light(Color.White, Color.White, new Vector(0, 5, -10, 1)));
+            lights.Add(new Light(Color.White, Color.White, new Vector(-20, 10, -25, 1)));
         }
 
         private void PrepareBitmap()
@@ -139,9 +171,13 @@ namespace Editor3D
 
         private void UpdateScene(object sender, EventArgs e)
         {
-            //balls[0].Translate(0, 1, 0);
+            balls[0].Translate(0.5 * sign, 0, 0);
+            if (balls[0].GetWorldPosition().x > 20)
+                sign = -1;
+            if (balls[0].GetWorldPosition().x < -20)
+                sign = 1;
             //balls[0].Rotate(1, Axis.X);
-            //balls[0].Rotate(1, Axis.Y);
+            balls[0].Rotate(1, Axis.Y);
             //balls[0].Rotate(1, Axis.Z);
             //balls[1].Translate(-0.1, 0, 0);
             //cuboids[0].Translate(0, 1, 0);
@@ -161,10 +197,13 @@ namespace Editor3D
 
         private void UpdateCameras()
         {
-            foreach (Camera camera in cameras)
-            {
-                camera.UpdateProperties((double)pictureBox1.Width / (double)pictureBox1.Height);
-            }
+            staticCamera.UpdateAspect((double)pictureBox1.Width / (double)pictureBox1.Height);
+            spyingCamera.UpdateAspect((double)pictureBox1.Width / (double)pictureBox1.Height);
+            spyingCamera.UpdateObservedPoint(balls[0].GetWorldPosition());
+            movingCamera.UpdateAspect((double)pictureBox1.Width / (double)pictureBox1.Height);
+            Vector movingCameraObservedPoint = balls[0].GetWorldPosition();
+            movingCamera.UpdateObservedPoint(balls[0].GetWorldPosition());
+            movingCamera.UpdateCameraPosition(movingCameraObservedPoint.Translate(new Vector(0, 0, 40, 1)));
         }
 
         private void RenderGraphics()
@@ -184,8 +223,10 @@ namespace Editor3D
 
         private void PrepareScene() // WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
         {
-            AddBall(10, Color.Green, 0, 0, -40);
+            AddBall(10, Color.Green, -20, 0, -40);
             //AddCuboid(10, 10, 10, Color.Green, -20, -10, -40);
+            for (int i = -20; i <= 20; i += 4)
+                AddCuboid(2, 2, 2, Color.Cyan, i, 12, -40);
         }
 
         private void PrepareTrackScene()
@@ -263,11 +304,10 @@ namespace Editor3D
 
         private PipelineInfo GeneratePipelineInfo()
         {
-            Camera currentCamera = cameras[currentCameraIndex];
-            return new PipelineInfo(currentCamera.GetViewMatrix(),
-                currentCamera.GetProjectionMatrix(), pictureBox1.Width, pictureBox1.Height,
-                currentCamera.GetForwardDirection(), SHOULD_RENDER_LINES, lights,
-                currentCamera.GetPosition());
+            return new PipelineInfo(CURRENT_CAMERA.GetViewMatrix(),
+                CURRENT_CAMERA.GetProjectionMatrix(), pictureBox1.Width, pictureBox1.Height,
+                CURRENT_CAMERA.GetForwardDirection(), SHOULD_RENDER_LINES, lights,
+                CURRENT_CAMERA.GetPosition());
         }
 
         public void Display(int x, int y, double z, Color color)
@@ -295,6 +335,21 @@ namespace Editor3D
         private void button4_Click(object sender, EventArgs e)
         {
             this.SHADING = Shading.Flat;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.CURRENT_CAMERA = staticCamera;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.CURRENT_CAMERA = spyingCamera;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.CURRENT_CAMERA = movingCamera;
         }
 
         private void button5_Click(object sender, EventArgs e)
